@@ -14,31 +14,39 @@ export default function RipidoHome() {
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.3)' }}></div>
       </div>
 
-      {/* 2. LOGO: Lime fluo rgb(223, 254, 2) con bordino nero netto da 1.5px garantito */}
-      <div style={{ position: 'absolute', top: '-25px', left: '2px', zIndex: 10, width: '240px' }}>
-        {/* Filtro SVG per il contorno nero */}
-        <svg width="0" height="0" style={{ position: 'absolute' }}>
-          <defs>
-            <filter id="ripido-stroke" x="-20%" y="-20%" width="140%" height="140%">
-              {/* Espande la sagoma di 1.5px per creare il bordo nero */}
-              <feMorphology in="SourceAlpha" result="dilated" operator="dilate" radius="1.5" />
-              <feFlood floodColor="#000000" result="black" />
-              <feComposite in="black" in2="dilated" operator="in" result="outline" />
-              
-              {/* Sovrappone la sagoma originale lime sopra il bordo nero */}
-              <feMerge>
-                <feMergeNode in="outline" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-        </svg>
+      {/* 2. LOGO: Lime rgb(223, 254, 2) con contorno nero netto */}
+      <div style={{ position: 'absolute', top: '-25px', left: '2px', zIndex: 10, width: '240px', aspectRatio: '1 / 1' }}>
+        
+        {/* Contorno nero (layer originali neri sfalsati di 1.5px) */}
+        {[-1.5, 0, 1.5].map((x) =>
+          [-1.5, 0, 1.5].map((y) => {
+            if (x === 0 && y === 0) return null;
+            return (
+              <img
+                key={`${x}-${y}`}
+                src="/logo-ripido.png"
+                alt=""
+                style={{
+                  position: 'absolute',
+                  top: `${y}px`,
+                  left: `${x}px`,
+                  width: '100%',
+                  height: 'auto',
+                  pointerEvents: 'none'
+                }}
+              />
+            );
+          })
+        )}
 
-        {/* Maschera del logo colorata in lime fluo con filtro attivo */}
+        {/* Sagoma superiore in lime fluo */}
         <div 
           style={{ 
+            position: 'absolute',
+            top: 0,
+            left: 0,
             width: '100%', 
-            aspectRatio: '1 / 1', 
+            height: '100%', 
             backgroundColor: 'rgb(223, 254, 2)',
             WebkitMaskImage: 'url(/logo-ripido.png)',
             maskImage: 'url(/logo-ripido.png)',
@@ -47,8 +55,7 @@ export default function RipidoHome() {
             WebkitMaskRepeat: 'no-repeat',
             maskRepeat: 'no-repeat',
             WebkitMaskPosition: 'left top',
-            maskPosition: 'left top',
-            filter: 'url(#ripido-stroke) drop-shadow(2px 4px 10px rgba(0,0,0,0.7))'
+            maskPosition: 'left top'
           }}
         />
       </div>
