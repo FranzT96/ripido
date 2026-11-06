@@ -18,7 +18,7 @@ export default function RipidoHome() {
             transform: translateX(-50%) !important;
           }
           .ripido-nav-bar {
-            top: 85px !important;
+            top: 115px !important;
             left: 50% !important;
             transform: translateX(-50%) !important;
             width: 100% !important;
