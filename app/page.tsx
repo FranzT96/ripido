@@ -14,25 +14,25 @@ export default function RipidoHome() {
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.3)' }}></div>
       </div>
 
-      {/* 2. LOGO: Ricolorato esattamente a rgb(223, 254, 2) */}
-<div style={{ position: 'absolute', top: '2px', left: '2px', zIndex: 10, width: '240px', height: '140px' }}>
-  <div 
-    style={{ 
-      width: '100%', 
-      height: '100%', 
-      backgroundColor: 'rgb(223, 254, 2)',
-      WebkitMaskImage: 'url(/logo-ripido.png)',
-      maskImage: 'url(/logo-ripido.png)',
-      WebkitMaskSize: 'contain',
-      maskSize: 'contain',
-      WebkitMaskRepeat: 'no-repeat',
-      maskRepeat: 'no-repeat',
-      WebkitMaskPosition: 'left top',
-      maskPosition: 'left top',
-      filter: 'drop-shadow(2px 4px 10px rgba(0,0,0,0.7))'
-    }}
-  />
-</div>
+      {/* 2. LOGO: Stesse identiche dimensioni, ma con colore rgb(223, 254, 2) */}
+      <div style={{ position: 'absolute', top: '2px', left: '2px', zIndex: 10, width: '240px' }}>
+        <div 
+          style={{ 
+            width: '100%', 
+            aspectRatio: '1 / 1', 
+            backgroundColor: 'rgb(223, 254, 2)',
+            WebkitMaskImage: 'url(/logo-ripido.png)',
+            maskImage: 'url(/logo-ripido.png)',
+            WebkitMaskSize: 'contain',
+            maskSize: 'contain',
+            WebkitMaskRepeat: 'no-repeat',
+            maskRepeat: 'no-repeat',
+            WebkitMaskPosition: 'left top',
+            maskPosition: 'left top',
+            filter: 'drop-shadow(2px 4px 10px rgba(0,0,0,0.7))'
+          }}
+        />
+      </div>
 
       {/* 3. TESTO: INVARIATO (Bloccato nella sua posizione perfetta) */}
       <div style={{ position: 'absolute', bottom: '150px', left: '40px', zIndex: 10, maxWidth: '50vw' }}>
