@@ -49,6 +49,27 @@ export default function RipidoHome() {
         }}
       >
         <Link 
+          href="/chi-siamo"
+          style={{
+            color: 'white',
+            textDecoration: 'none',
+            fontSize: '13px',
+            fontWeight: '700',
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+            padding: '10px 22px',
+            border: '1px solid rgba(255, 255, 255, 0.4)',
+            borderRadius: '9999px',
+            backgroundColor: 'rgba(0, 0, 0, 0.25)',
+            backdropFilter: 'blur(8px)',
+            textShadow: '0 2px 8px rgba(0,0,0,0.6)',
+            display: 'inline-block'
+          }}
+        >
+          Chi siamo
+        </Link>
+
+        <Link 
           href="/prossime-uscite"
           style={{
             color: 'white',
@@ -98,7 +119,7 @@ export default function RipidoHome() {
         <h1 style={{ color: 'white', fontSize: 'clamp(1.5rem, 3.5vw, 3.5rem)', fontWeight: 'bold', lineHeight: '1.2', margin: 0, textShadow: '2px 4px 15px rgba(0,0,0,0.9)', whiteSpace: 'nowrap' }}>
           The mountains are calling.<br />
           <span style={{ fontStyle: 'italic', fontWeight: '300' }}>Your friends aren't.</span><br />
-          Find your people.
+          <span style={{ color: 'rgb(223, 254, 2)' }}>Find your people.</span>
         </h1>
       </div>
 
