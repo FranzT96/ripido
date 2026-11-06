@@ -15,7 +15,7 @@ export default function RipidoHome() {
       </div>
 
       {/* 2. LOGO: Stesse identiche dimensioni, ma con colore rgb(223, 254, 2) */}
-      <div style={{ position: 'absolute', top: '2px', left: '2px', zIndex: 10, width: '240px' }}>
+      <div style={{ position: 'absolute', top: '-25px', left: '2px', zIndex: 10, width: '240px' }}>
         <div 
           style={{ 
             width: '100%', 
