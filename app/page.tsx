@@ -15,7 +15,7 @@ export default function RipidoHome() {
       </div>
 
       {/* 2. LOGO: Spinto all'estremo in alto a sinistra (top 5px, left 5px) */}
-      <div style={{ position: 'absolute', top: '5px', left: '5px', zIndex: 10, width: '240px' }}>
+      <div style={{ position: 'absolute', top: '2px', left: '2px', zIndex: 10, width: '240px' }}>
         <img 
           src="/logo-ripido.png" 
           alt="Logo Ripido" 
