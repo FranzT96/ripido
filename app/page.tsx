@@ -14,8 +14,8 @@ export default function RipidoHome() {
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.3)' }}></div>
       </div>
 
-      {/* 2. LOGO: Ingrandito per riempire il riquadro rosso (da 120px a 240px) */}
-      <div style={{ position: 'absolute', top: '40px', left: '40px', zIndex: 10, width: '240px' }}>
+      {/* 2. LOGO: Spostato nell'estremo angolo in alto a sinistra per superare l'albero (top 15px, left 20px) */}
+      <div style={{ position: 'absolute', top: '15px', left: '20px', zIndex: 10, width: '240px' }}>
         <img 
           src="/logo-ripido.png" 
           alt="Logo Ripido" 
@@ -23,8 +23,8 @@ export default function RipidoHome() {
         />
       </div>
 
-      {/* 3. TESTO: Rimpicciolito, bloccato su singole righe (nowrap) e limitato a metà pagina (50vw) */}
-      <div style={{ position: 'absolute', bottom: '80px', left: '40px', zIndex: 10, maxWidth: '50vw' }}>
+      {/* 3. TESTO: Alzato (bottom portato da 80px a 150px per farlo respirare) */}
+      <div style={{ position: 'absolute', bottom: '150px', left: '40px', zIndex: 10, maxWidth: '50vw' }}>
         <h1 style={{ color: 'white', fontSize: 'clamp(1.5rem, 3.5vw, 3.5rem)', fontWeight: 'bold', lineHeight: '1.2', margin: 0, textShadow: '2px 4px 15px rgba(0,0,0,0.9)', whiteSpace: 'nowrap' }}>
           The mountains are calling.<br />
           <span style={{ fontStyle: 'italic', fontWeight: '300' }}>Your friends aren't.</span><br />
