@@ -3,51 +3,59 @@ import Link from 'next/link';
 
 export default function RipidoHome() {
   return (
-    <main style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden', margin: 0, padding: 0, backgroundColor: 'black' }}>
+    <main style={{ position: 'relative', width: '100%', height: '100dvh', overflow: 'hidden', margin: 0, padding: 0, backgroundColor: 'black' }}>
+      {/* Nota: height 100dvh previene problemi con la barra di navigazione mobile */}
       
-      {/* 1. SFONDO e OVERLAY SCURO */}
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
-        <img 
-          src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2000&auto=format&fit=crop" 
-          alt="Montagne maestose" 
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-        />
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.3)' }}></div>
-      </div>
-
-      {/* STILI RESPONSIVE DEDICATI PER SMARTPHONE */}
       <style>{`
         @media (max-width: 768px) {
+          .ripido-bg-img {
+            object-position: 25% center !important; /* Non taglia via gli alberi a sinistra su mobile */
+          }
           .ripido-logo-box {
             width: 140px !important;
+            left: 50% !important;
             top: -15px !important;
-            left: 0px !important;
+            transform: translateX(-50%) !important;
           }
           .ripido-nav-bar {
-            top: 75px !important;
+            top: 85px !important;
             left: 50% !important;
             transform: translateX(-50%) !important;
             width: 100% !important;
             justify-content: center !important;
             gap: 8px !important;
-            padding: 0 12px !important;
+            padding: 0 10px !important;
           }
           .ripido-btn {
             font-size: 10px !important;
-            padding: 7px 12px !important;
+            padding: 8px 14px !important;
             letter-spacing: 0.1em !important;
           }
           .ripido-motto-box {
-            bottom: 45px !important;
-            left: 20px !important;
-            max-width: 90vw !important;
+            bottom: 50px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            max-width: 95vw !important;
+            width: 100% !important;
+            text-align: center !important;
           }
           .ripido-motto-text {
-            font-size: clamp(1.35rem, 5.8vw, 2.2rem) !important;
-            line-height: 1.25 !important;
+            font-size: clamp(1.3rem, 6vw, 2.2rem) !important;
           }
         }
       `}</style>
+
+      {/* 1. SFONDO e OVERLAY SCURO */}
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
+        <img 
+          className="ripido-bg-img"
+          src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2000&auto=format&fit=crop" 
+          alt="Montagne maestose" 
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+        {/* L'overlay è leggermente sfumato in basso per migliorare la lettura su mobile */}
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%)' }}></div>
+      </div>
 
       {/* 2. LOGO */}
       <div className="ripido-logo-box" style={{ position: 'absolute', top: '-25px', left: '2px', zIndex: 10, width: '240px', aspectRatio: '1 / 1' }}>
@@ -86,70 +94,23 @@ export default function RipidoHome() {
         <Link 
           href="/chi-siamo"
           className="ripido-btn"
-          style={{
-            color: 'white',
-            textDecoration: 'none',
-            fontSize: '13px',
-            fontWeight: '700',
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-            padding: '10px 22px',
-            border: '1px solid rgba(255, 255, 255, 0.4)',
-            borderRadius: '9999px',
-            backgroundColor: 'rgba(0, 0, 0, 0.25)',
-            backdropFilter: 'blur(8px)',
-            textShadow: '0 2px 8px rgba(0,0,0,0.6)',
-            display: 'inline-block',
-            whiteSpace: 'nowrap'
-          }}
+          style={{ color: 'white', textDecoration: 'none', fontSize: '13px', fontWeight: '700', letterSpacing: '0.18em', textTransform: 'uppercase', padding: '10px 22px', border: '1px solid rgba(255, 255, 255, 0.4)', borderRadius: '9999px', backgroundColor: 'rgba(0, 0, 0, 0.25)', backdropFilter: 'blur(8px)', textShadow: '0 2px 8px rgba(0,0,0,0.6)', display: 'inline-block', whiteSpace: 'nowrap' }}
         >
           Chi siamo
         </Link>
-
         <Link 
           href="/prossime-uscite"
           className="ripido-btn"
-          style={{
-            color: 'white',
-            textDecoration: 'none',
-            fontSize: '13px',
-            fontWeight: '700',
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-            padding: '10px 22px',
-            border: '1px solid rgba(255, 255, 255, 0.4)',
-            borderRadius: '9999px',
-            backgroundColor: 'rgba(0, 0, 0, 0.25)',
-            backdropFilter: 'blur(8px)',
-            textShadow: '0 2px 8px rgba(0,0,0,0.6)',
-            display: 'inline-block',
-            whiteSpace: 'nowrap'
-          }}
+          style={{ color: 'white', textDecoration: 'none', fontSize: '13px', fontWeight: '700', letterSpacing: '0.18em', textTransform: 'uppercase', padding: '10px 22px', border: '1px solid rgba(255, 255, 255, 0.4)', borderRadius: '9999px', backgroundColor: 'rgba(0, 0, 0, 0.25)', backdropFilter: 'blur(8px)', textShadow: '0 2px 8px rgba(0,0,0,0.6)', display: 'inline-block', whiteSpace: 'nowrap' }}
         >
           Prossime Uscite
         </Link>
-
         <a 
           href="https://instagram.com" 
           target="_blank" 
           rel="noopener noreferrer"
           className="ripido-btn"
-          style={{
-            color: 'white',
-            textDecoration: 'none',
-            fontSize: '13px',
-            fontWeight: '700',
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-            padding: '10px 22px',
-            border: '1px solid rgba(255, 255, 255, 0.4)',
-            borderRadius: '9999px',
-            backgroundColor: 'rgba(0, 0, 0, 0.25)',
-            backdropFilter: 'blur(8px)',
-            textShadow: '0 2px 8px rgba(0,0,0,0.6)',
-            display: 'inline-block',
-            whiteSpace: 'nowrap'
-          }}
+          style={{ color: 'white', textDecoration: 'none', fontSize: '13px', fontWeight: '700', letterSpacing: '0.18em', textTransform: 'uppercase', padding: '10px 22px', border: '1px solid rgba(255, 255, 255, 0.4)', borderRadius: '9999px', backgroundColor: 'rgba(0, 0, 0, 0.25)', backdropFilter: 'blur(8px)', textShadow: '0 2px 8px rgba(0,0,0,0.6)', display: 'inline-block', whiteSpace: 'nowrap' }}
         >
           Social
         </a>
