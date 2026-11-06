@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 
-// Montserrat è perfetto per i titoli giganti in stile Pampero
-const montserrat = Montserrat({ subsets: ["latin"] });
+const montserrat = Montserrat({ subsets: ["latin"], weight: ["400", "700", "900"] });
 
 export const metadata: Metadata = {
   title: "Ripido | La montagna tra sconosciuti",
@@ -16,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="it">
-      <body className={`${montserrat.className} bg-[#F9F9F6] text-[#111827] antialiased m-0 p-0 overflow-x-hidden selection:bg-slate-900 selection:text-white`}>
+    <html lang="it" className="m-0 p-0 w-full h-full">
+      <body className={`${montserrat.className} bg-[#111827] text-white m-0 p-0 w-full h-full overflow-x-hidden antialiased selection:bg-white selection:text-black`}>
         {children}
       </body>
     </html>
