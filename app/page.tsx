@@ -4,48 +4,55 @@ export default function RipidoHome() {
   return (
     <main className="w-full min-h-screen m-0 p-0 bg-[#F9F9F6]">
       
-      {/* HERO SECTION A TUTTO SCHERMO SENZA BORDI */}
-      <section className="relative w-full h-[100vh] m-0 p-0 overflow-hidden flex flex-col justify-between">
+      {/* HERO SECTION A TUTTO SCHERMO */}
+      <section className="relative w-full h-screen m-0 p-0 overflow-hidden flex flex-col justify-between">
         
-        {/* LA TUA FOTO DI SFONDO (Copertura matematica 100%) */}
+        {/* FOTO DI SFONDO (Inquadratura naturale e a fuoco) */}
         <div className="absolute inset-0 z-0 w-full h-full pointer-events-none">
           <img 
             src="/3Cime.jpg" 
             alt="Tre Cime di Lavaredo" 
-            className="w-full h-full object-cover object-center scale-105"
+            className="w-full h-full object-cover object-center"
           />
-          {/* Doppio overlay scuro per assicurare la leggibilità in ogni condizione */}
-          <div className="absolute inset-0 bg-black/40 z-10"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#111827] via-transparent to-black/50 z-20"></div>
+          {/* Overlay protettivo per i testi (Gradiente scuro profondo dal basso e leggera ombra dall'alto) */}
+          <div className="absolute inset-0 bg-black/25 z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/30 z-20"></div>
         </div>
 
-        {/* NAVBAR MINIMALE SUPERIORE */}
+        {/* NAVBAR SUPERIORE BEN VISIBILE */}
         <nav className="relative z-30 w-full p-6 md:p-10 flex justify-between items-center text-white">
-          <div className="font-black text-2xl md:text-3xl tracking-tighter uppercase cursor-pointer">
+          <div className="font-black text-2xl md:text-3xl tracking-tighter uppercase cursor-pointer drop-shadow-md">
             Ripido
           </div>
-          <div className="hidden md:flex gap-8 text-[11px] font-black tracking-widest uppercase">
+          <div className="hidden md:flex gap-8 text-[11px] font-black tracking-widest uppercase drop-shadow-md">
             <a href="#giri" className="hover:text-slate-300 transition-colors">I Giri</a>
             <a href="#filosofia" className="hover:text-slate-300 transition-colors">Filosofia</a>
             <a href="#guide" className="hover:text-slate-300 transition-colors">Admin</a>
           </div>
         </nav>
 
-        {/* CONTENUTO CENTRALE / BASSO (Sempre visibile e leggibile) */}
-        <div className="relative z-30 w-full px-6 md:px-12 pb-16 md:pb-24 max-w-5xl self-start flex flex-col justify-end h-full">
-          <p className="font-mono text-xs md:text-sm tracking-widest uppercase mb-4 text-slate-300 font-bold">
+        {/* CONTENUTO CENTRALE / BASSO (Rialzato e con forte contrasto) */}
+        <div className="relative z-30 w-full px-6 md:px-12 pb-20 md:pb-32 max-w-5xl self-start flex flex-col justify-end h-full">
+          {/* Coordinate GPS: rialzate e ad alto contrasto */}
+          <p className="font-mono text-xs md:text-sm tracking-widest uppercase mb-3 text-[#00a0b0] font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
             46° 11' 33" N — 7° 52' 12" E
           </p>
-          <h1 className="text-5xl md:text-[6.5rem] font-black tracking-tighter leading-[0.9] mb-6 text-white drop-shadow-md">
+          
+          {/* Titolo principale: gigantesco e d'impatto */}
+          <h1 className="text-4xl md:text-7xl lg:text-[6.5rem] font-black tracking-tighter leading-[0.9] mb-5 text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)]">
             La montagna <br /> tra sconosciuti.
           </h1>
-          <p className="text-base md:text-lg font-medium max-w-xl mb-8 text-slate-200 leading-relaxed drop-shadow">
+          
+          {/* Sottotitolo descrittivo: spostato più su e chiaramente leggibile */}
+          <p className="text-sm md:text-lg font-bold max-w-xl mb-8 text-slate-200 leading-relaxed drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
             Niente turisti. Solo gente che ha voglia di fare fatica, condividere il passo e scoprire storie inesplorate nelle terre alte.
           </p>
+          
+          {/* Bottone: rialzato dai limiti inferiori per evitare che venga tagliato */}
           <div className="self-start">
             <a 
               href="#giri" 
-              className="inline-block bg-white text-black font-black uppercase tracking-widest text-[11px] px-10 py-5 rounded-full hover:bg-slate-100 hover:scale-105 active:scale-95 transition-all duration-300 shadow-xl"
+              className="inline-block bg-white hover:bg-slate-100 text-[#111827] font-black uppercase tracking-widest text-[11px] px-10 py-5 rounded-full hover:scale-105 active:scale-95 transition-all duration-300 shadow-2xl"
             >
               Unisciti alla cordata
             </a>
@@ -54,7 +61,7 @@ export default function RipidoHome() {
 
       </section>
 
-      {/* SEZIONE GIRI (Con colore di contrasto pietra/panna per separare dall'hero) */}
+      {/* SEZIONE GIRI (Invariata, con il suo contrasto naturale pietra/panna) */}
       <section id="giri" className="py-32 px-6 md:px-12 max-w-[1400px] mx-auto bg-[#F9F9F6] text-[#111827]">
         <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
           <div>
@@ -65,10 +72,9 @@ export default function RipidoHome() {
           </div>
         </div>
 
-        {/* CARD SINGOLO GIRO COMPATIBILE */}
+        {/* CARD GIRO */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16 items-center">
           
-          {/* Foto grande a sinistra */}
           <div className="md:col-span-7 h-[45vh] md:h-[65vh] w-full bg-slate-200 overflow-hidden relative rounded-xl md:rounded-3xl shadow-lg">
             <img 
               src="https://images.unsplash.com/photo-1522346513757-54c552451fdc?q=80&w=1200&auto=format&fit=crop" 
@@ -77,7 +83,6 @@ export default function RipidoHome() {
             />
           </div>
           
-          {/* Contenuto e Tabella Tecnica a destra */}
           <div className="md:col-span-5 flex flex-col justify-center py-4">
             <div className="flex gap-3 mb-6">
               <span className="border border-slate-800 text-slate-800 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-full">EE (Esperti)</span>
@@ -96,15 +101,15 @@ export default function RipidoHome() {
                 <p className="font-black text-2xl">+ 1.200m</p>
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest font-black text-slate-500 mb-1">Durata</p>
+                <p className="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-1">Durata</p>
                 <p className="font-black text-2xl">7 Ore</p>
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest font-black text-slate-500 mb-1">Partenza</p>
+                <p className="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-1">Partenza</p>
                 <p className="font-black text-2xl">06:00 AM</p>
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest font-black text-slate-500 mb-1">Posti Rimasti</p>
+                <p className="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-1">Posti Rimasti</p>
                 <p className="font-black text-2xl">3 / 8</p>
               </div>
             </div>
