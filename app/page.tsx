@@ -14,8 +14,8 @@ export default function RipidoHome() {
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.3)' }}></div>
       </div>
 
-      {/* 2. LOGO: Spostato nell'estremo angolo in alto a sinistra per superare l'albero (top 15px, left 20px) */}
-      <div style={{ position: 'absolute', top: '15px', left: '20px', zIndex: 10, width: '240px' }}>
+      {/* 2. LOGO: Spinto all'estremo in alto a sinistra (top 5px, left 5px) */}
+      <div style={{ position: 'absolute', top: '5px', left: '5px', zIndex: 10, width: '240px' }}>
         <img 
           src="/logo-ripido.png" 
           alt="Logo Ripido" 
@@ -23,7 +23,7 @@ export default function RipidoHome() {
         />
       </div>
 
-      {/* 3. TESTO: Alzato (bottom portato da 80px a 150px per farlo respirare) */}
+      {/* 3. TESTO: INVARIATO (Bloccato nella sua posizione perfetta) */}
       <div style={{ position: 'absolute', bottom: '150px', left: '40px', zIndex: 10, maxWidth: '50vw' }}>
         <h1 style={{ color: 'white', fontSize: 'clamp(1.5rem, 3.5vw, 3.5rem)', fontWeight: 'bold', lineHeight: '1.2', margin: 0, textShadow: '2px 4px 15px rgba(0,0,0,0.9)', whiteSpace: 'nowrap' }}>
           The mountains are calling.<br />
