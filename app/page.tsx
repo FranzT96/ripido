@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 
 export default function RipidoHome() {
   return (
@@ -14,37 +15,10 @@ export default function RipidoHome() {
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.3)' }}></div>
       </div>
 
-      {/* 2. LOGO: Lime rgb(223, 254, 2) con contorno nero netto */}
+      {/* 2. LOGO: Invariato (Opzione 1 fluo rgb(223, 254, 2)) */}
       <div style={{ position: 'absolute', top: '-25px', left: '2px', zIndex: 10, width: '240px', aspectRatio: '1 / 1' }}>
-        
-        {/* Contorno nero (layer originali neri sfalsati di 1.5px) */}
-        {[-1.5, 0, 1.5].map((x) =>
-          [-1.5, 0, 1.5].map((y) => {
-            if (x === 0 && y === 0) return null;
-            return (
-              <img
-                key={`${x}-${y}`}
-                src="/logo-ripido.png"
-                alt=""
-                style={{
-                  position: 'absolute',
-                  top: `${y}px`,
-                  left: `${x}px`,
-                  width: '100%',
-                  height: 'auto',
-                  pointerEvents: 'none'
-                }}
-              />
-            );
-          })
-        )}
-
-        {/* Sagoma superiore in lime fluo */}
         <div 
           style={{ 
-            position: 'absolute',
-            top: 0,
-            left: 0,
             width: '100%', 
             height: '100%', 
             backgroundColor: 'rgb(223, 254, 2)',
@@ -55,12 +29,71 @@ export default function RipidoHome() {
             WebkitMaskRepeat: 'no-repeat',
             maskRepeat: 'no-repeat',
             WebkitMaskPosition: 'left top',
-            maskPosition: 'left top'
+            maskPosition: 'left top',
+            filter: 'drop-shadow(2px 4px 10px rgba(0,0,0,0.5))'
           }}
         />
       </div>
 
-      {/* 3. TESTO: INVARIATO (Bloccato nella sua posizione perfetta) */}
+      {/* 3. PULSANTI IN ALTO (Posizionati nel riquadro rosso) */}
+      <div 
+        style={{ 
+          position: 'absolute', 
+          top: '38px', 
+          left: '55%', 
+          transform: 'translateX(-50%)', 
+          zIndex: 10, 
+          display: 'flex', 
+          gap: '24px', 
+          alignItems: 'center' 
+        }}
+      >
+        <Link 
+          href="/prossime-uscite"
+          style={{
+            color: 'white',
+            textDecoration: 'none',
+            fontSize: '13px',
+            fontWeight: '700',
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+            padding: '10px 22px',
+            border: '1px solid rgba(255, 255, 255, 0.4)',
+            borderRadius: '9999px',
+            backgroundColor: 'rgba(0, 0, 0, 0.25)',
+            backdropFilter: 'blur(8px)',
+            textShadow: '0 2px 8px rgba(0,0,0,0.6)',
+            display: 'inline-block'
+          }}
+        >
+          Prossime Uscite
+        </Link>
+
+        <a 
+          href="https://instagram.com" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style={{
+            color: 'white',
+            textDecoration: 'none',
+            fontSize: '13px',
+            fontWeight: '700',
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+            padding: '10px 22px',
+            border: '1px solid rgba(255, 255, 255, 0.4)',
+            borderRadius: '9999px',
+            backgroundColor: 'rgba(0, 0, 0, 0.25)',
+            backdropFilter: 'blur(8px)',
+            textShadow: '0 2px 8px rgba(0,0,0,0.6)',
+            display: 'inline-block'
+          }}
+        >
+          Social
+        </a>
+      </div>
+
+      {/* 4. TESTO: Invariato (Bloccato in basso a sinistra) */}
       <div style={{ position: 'absolute', bottom: '150px', left: '40px', zIndex: 10, maxWidth: '50vw' }}>
         <h1 style={{ color: 'white', fontSize: 'clamp(1.5rem, 3.5vw, 3.5rem)', fontWeight: 'bold', lineHeight: '1.2', margin: 0, textShadow: '2px 4px 15px rgba(0,0,0,0.9)', whiteSpace: 'nowrap' }}>
           The mountains are calling.<br />
