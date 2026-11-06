@@ -14,7 +14,7 @@ export default function RipidoHome() {
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.3)' }}></div>
       </div>
 
-      {/* 2. LOGO: Stesse identiche dimensioni, ma con colore rgb(223, 254, 2) */}
+      {/* 2. LOGO: Con bordino nero di 1px simulato tramite multi drop-shadow */}
       <div style={{ position: 'absolute', top: '-25px', left: '2px', zIndex: 10, width: '240px' }}>
         <div 
           style={{ 
@@ -29,7 +29,14 @@ export default function RipidoHome() {
             maskRepeat: 'no-repeat',
             WebkitMaskPosition: 'left top',
             maskPosition: 'left top',
-            filter: 'drop-shadow(2px 4px 10px rgba(0,0,0,0.7))'
+            // Le prime 4 ombre creano il bordino nero solido, l'ultima crea l'ombra morbida
+            filter: `
+              drop-shadow(1px 0px 0px black) 
+              drop-shadow(-1px 0px 0px black) 
+              drop-shadow(0px 1px 0px black) 
+              drop-shadow(0px -1px 0px black) 
+              drop-shadow(2px 4px 10px rgba(0,0,0,0.7))
+            `
           }}
         />
       </div>
