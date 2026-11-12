@@ -6,7 +6,18 @@ export default function ProssimeUscite() {
   // Dati di esempio arricchiti con immagini e descrizioni
   const usciteData = [
     // --- IN PROGRAMMA ---
-    { id: 1, data: 'Sabato 14 Novembre', titolo: 'Monte Lussari e Cima Cacciatore', regione: 'FVG', dPlus: '900m', km: '12km', livello: 'E', guide: 'Andrea', past: false, immagine: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=800&auto=format&fit=crop', descrizione: 'Un grande classico delle Alpi Giulie. Saliremo al suggestivo borgo del Lussari per poi attaccare la Cima Cacciatore. Panorama a 360 gradi garantito su Austria e Slovenia.' },
+    { 
+      id: 1, data: 'Domenica 15 Novembre', titolo: 'Bosco degli Eroi', regione: 'Veneto', 
+      dPlus: '400m', km: '10km', livello: 'E (Escursionistico)', guide: 'Andrea', past: false, 
+      immagine: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=800&auto=format&fit=crop',
+      // Nuovi campi tecnici stile WhatsApp (al posto della descrizione discorsiva)
+      maxPartecipanti: 15,
+      pernottamento: 'No',
+      puntoPartenza: 'Rifugio Bocchette, Seren del Grappa',
+      puntoArrivo: 'Rifugio Bocchette',
+      tipologia: 'Anello',
+      tempoStimato: '3 h'
+    },
     { id: 2, data: 'Sabato 14 Novembre', titolo: 'Lago di Sorapis via sentiero 215', regione: 'Veneto', dPlus: '400m', km: '10km', livello: 'E', guide: 'Giada', past: false, immagine: 'https://images.unsplash.com/photo-1522616238699-a9314455acdb?q=80&w=800&auto=format&fit=crop', descrizione: 'Trekking fotografico verso uno dei laghi più iconici delle Dolomiti. Il sentiero presenta alcuni tratti esposti attrezzati con cordino metallico, ma tecnicamente semplici.' },
     { id: 3, data: 'Sabato 14 Novembre', titolo: 'Rifugio Tuckett e Casinei', regione: 'Trentino', dPlus: '800m', km: '14km', livello: 'E', guide: 'Matteo', past: false, immagine: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?q=80&w=800&auto=format&fit=crop', descrizione: 'Immersione nel cuore delle Dolomiti di Brenta. Un giro ad anello spettacolare passando ai piedi di pareti verticali impressionanti.' },
     { id: 4, data: 'Sabato 21 Novembre', titolo: 'Cima Carega dal Rifugio Revolto', regione: 'Veneto', dPlus: '1100m', km: '15km', livello: 'EE', guide: 'Andrea', past: false, immagine: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?q=80&w=800&auto=format&fit=crop', descrizione: 'Un\'escursione impegnativa nel gruppo delle Piccole Dolomiti. L\'ambiente roccioso e severo ci accompagnerà fino alla cima a quota 2.259m.' },
@@ -267,15 +278,48 @@ export default function ProssimeUscite() {
                 {selectedUscita.titolo}
               </h2>
               
-              <div className="tech-specs" style={{ margin: '0 0 25px 0', fontSize: '16px', color: '#ccc' }}>
-                <span><strong>Dislivello:</strong> {selectedUscita.dPlus}</span>
-                <span><strong>Distanza:</strong> {selectedUscita.km}</span>
-                <span><strong>Difficoltà:</strong> {selectedUscita.livello}</span>
+              {/* Dettagli strutturati stile WhatsApp */}
+              <div style={{ backgroundColor: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: '12px', marginBottom: '30px' }}>
+                
+                <h3 style={{ fontSize: '14px', color: 'rgb(223, 254, 2)', marginTop: 0, marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Dettagli Escursione
+                </h3>
+
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.95rem', color: '#ccc', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                    <span style={{ color: '#888' }}>Punto di partenza:</span>
+                    <span style={{ color: 'white', textAlign: 'right', maxWidth: '60%' }}>{selectedUscita.puntoPartenza || 'Da definire'}</span>
+                  </li>
+                  <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                    <span style={{ color: '#888' }}>Punto di arrivo:</span>
+                    <span style={{ color: 'white', textAlign: 'right', maxWidth: '60%' }}>{selectedUscita.puntoArrivo || 'Da definire'}</span>
+                  </li>
+                  <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                    <span style={{ color: '#888' }}>Tipologia:</span>
+                    <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.tipologia || '-'}</span>
+                  </li>
+                  <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                    <span style={{ color: '#888' }}>Lunghezza:</span>
+                    <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.km}</span>
+                  </li>
+                  <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                    <span style={{ color: '#888' }}>Dislivello positivo:</span>
+                    <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.dPlus}</span>
+                  </li>
+                  <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                    <span style={{ color: '#888' }}>Tempo stimato:</span>
+                    <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.tempoStimato || '-'}</span>
+                  </li>
+                  <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                    <span style={{ color: '#888' }}>Difficoltà:</span>
+                    <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.livello}</span>
+                  </li>
+                  <li style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '4px' }}>
+                    <span style={{ color: '#888' }}>Max partecipanti:</span>
+                    <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.maxPartecipanti || 'Nessun limite'}</span>
+                  </li>
+                </ul>
               </div>
-              
-              <p style={{ fontSize: '1rem', lineHeight: '1.6', color: '#aaa', marginBottom: '30px' }}>
-                {selectedUscita.descrizione}
-              </p>
               
               <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: '14px', color: '#888' }}>
