@@ -43,13 +43,12 @@ export default function ProssimeUscite() {
   return (
     <main style={{ position: 'relative', width: '100%', minHeight: '100dvh', color: 'white', padding: '40px 20px', fontFamily: 'sans-serif', overflow: 'hidden' }}>
       
-      {/* BACKGROUND VERE LINEE TOPOGRAFICHE */}
+      {/* BACKGROUND VERE LINEE TOPOGRAFICHE (File Locale) */}
       <div style={{
         position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1,
-        backgroundImage: 'url("https://www.transparenttextures.com/patterns/topography.png")',
-        backgroundSize: '600px',
-        opacity: 0.15, /* Abbassiamo a 0.15 perché ora sono bianche e molto luminose */
-        filter: 'invert(1)' /* Questo inverte le linee da nere a bianche! */
+        backgroundImage: 'url("/topografia.png")', /* Pesca il file dalla cartella public */
+        backgroundSize: 'cover', /* Usa 'cover' se è una foto intera, oppure '600px' se è un pattern piccolo che deve ripetersi */
+        opacity: 0.2 /* Regola questo valore: 0.1 è leggerissimo, 0.5 è molto visibile */
       }} />
       <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: '#0a0a0a', zIndex: -2 }} />
 
