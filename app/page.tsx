@@ -113,25 +113,38 @@ export default function RipidoHome() {
         >
           Eventi speciali
         </Link>
-        
-        <a 
-          href="https://instagram.com" 
-          target="_blank" 
-          rel="noopener noreferrer"
+
+        <Link 
+          href="/social"
           className="ripido-btn"
           style={{ color: 'white', textDecoration: 'none', fontSize: '13px', fontWeight: '700', letterSpacing: '0.18em', textTransform: 'uppercase', padding: '10px 22px', border: '1px solid rgba(255, 255, 255, 0.4)', borderRadius: '9999px', backgroundColor: 'rgba(0, 0, 0, 0.25)', backdropFilter: 'blur(8px)', textShadow: '0 2px 8px rgba(0,0,0,0.6)', display: 'inline-block', whiteSpace: 'nowrap' }}
         >
           Social
-        </a>
+        </Link>
       </div>
 
       {/* 4. TESTO */}
-      <div className="ripido-motto-box" style={{ position: 'absolute', bottom: '150px', left: '40px', zIndex: 10, maxWidth: '50vw' }}>
+      <div className="ripido-motto-box" style={{ position: 'absolute', bottom: '150px', left: '40px', zIndex: 10, maxWidth: '50vw', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '20px' }}>
         <h1 className="ripido-motto-text" style={{ color: 'white', fontSize: 'clamp(1.5rem, 3.5vw, 3.5rem)', fontWeight: 'bold', lineHeight: '1.2', margin: 0, textShadow: '2px 4px 15px rgba(0,0,0,0.9)', whiteSpace: 'nowrap' }}>
           The mountains are calling.<br />
           <span style={{ fontStyle: 'italic', fontWeight: '300' }}>Your friends aren't.</span><br />
           <span style={{ color: 'rgb(223, 254, 2)' }}>Find your people.</span>
         </h1>
+        
+        {/* Pulsante Call to Action Primario (Nascosto da regole CSS precedenti su mobile se non aggiorniamo align-items, ma l'inline flex-start risolve per desktop) */}
+        <Link 
+          href="/social"
+          className="cta-bottom"
+          style={{ 
+            backgroundColor: 'white', color: 'black', textDecoration: 'none', 
+            padding: '14px 28px', borderRadius: '99px', fontWeight: 'bold', 
+            textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '14px',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.5)', marginTop: '10px',
+            alignSelf: 'inherit' /* Eredita l'allineamento (sinistra su PC, centro su Mobile se gestito) */
+          }}
+        >
+          Entra nella Community
+        </Link>
       </div>
 
     </main>
