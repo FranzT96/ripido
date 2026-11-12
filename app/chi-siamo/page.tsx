@@ -27,8 +27,17 @@ export default function ChiSiamo() {
   ];
 
   return (
-    <main style={{ position: 'relative', width: '100%', minHeight: '100dvh', backgroundColor: 'black', color: 'white', padding: '40px 20px', fontFamily: 'sans-serif' }}>
+    <main style={{ position: 'relative', width: '100%', minHeight: '100dvh', color: 'white', padding: '40px 20px', fontFamily: 'sans-serif', overflow: 'hidden' }}>
       
+      {/* BACKGROUND CHI SIAMO (Cresta e persone) */}
+      <div style={{
+        position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1,
+        backgroundImage: 'url("https://images.unsplash.com/photo-1516934571936-ce4710185e78?q=80&w=1920&auto=format&fit=crop")',
+        backgroundSize: 'cover', backgroundPosition: 'center', 
+        opacity: 0.15 
+      }} />
+      <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.85)', zIndex: -2 }} />
+
       {/* Regole responsive per impaginare su smartphone */}
       <style>{`
         .founder-row {

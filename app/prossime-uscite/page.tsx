@@ -49,8 +49,17 @@ export default function ProssimeUscite() {
   }, {} as Record<string, typeof usciteData>);
 
   return (
-    <main style={{ position: 'relative', width: '100%', minHeight: '100dvh', backgroundColor: 'black', color: 'white', padding: '40px 20px', fontFamily: 'sans-serif' }}>
+    <main style={{ position: 'relative', width: '100%', minHeight: '100dvh', color: 'white', padding: '40px 20px', fontFamily: 'sans-serif', overflow: 'hidden' }}>
       
+      {/* BACKGROUND PROSSIME USCITE (Sentiero e vette) */}
+      <div style={{
+        position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1,
+        backgroundImage: 'url("https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?q=80&w=1920&auto=format&fit=crop")',
+        backgroundSize: 'cover', backgroundPosition: 'center', 
+        opacity: 0.15 
+      }} />
+      <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.85)', zIndex: -2 }} />
+
       <style>{`
         .uscita-row {
           display: grid;
