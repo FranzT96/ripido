@@ -3,24 +3,25 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 export default function ProssimeUscite() {
-  // Dati di esempio (in futuro potrai collegarli a un database o Google Sheets)
+  // Dati di esempio arricchiti con immagini e descrizioni
   const usciteData = [
     // --- IN PROGRAMMA ---
-    { id: 1, data: 'Sabato 14 Novembre', titolo: 'Monte Lussari e Cima Cacciatore', regione: 'FVG', dPlus: '900m', km: '12km', livello: 'E', guide: 'Andrea', past: false },
-    { id: 2, data: 'Sabato 14 Novembre', titolo: 'Lago di Sorapis via sentiero 215', regione: 'Veneto', dPlus: '400m', km: '10km', livello: 'E', guide: 'Giada', past: false },
-    { id: 3, data: 'Sabato 14 Novembre', titolo: 'Rifugio Tuckett e Casinei', regione: 'Trentino', dPlus: '800m', km: '14km', livello: 'E', guide: 'Matteo', past: false },
-    { id: 4, data: 'Sabato 21 Novembre', titolo: 'Cima Carega dal Rifugio Revolto', regione: 'Veneto', dPlus: '1100m', km: '15km', livello: 'EE', guide: 'Andrea', past: false },
-    { id: 5, data: 'Sabato 21 Novembre', titolo: 'Rocciamelone (3538m)', regione: 'Piemonte', dPlus: '1500m', km: '9km', livello: 'EE', guide: 'Matteo', past: false },
+    { id: 1, data: 'Sabato 14 Novembre', titolo: 'Monte Lussari e Cima Cacciatore', regione: 'FVG', dPlus: '900m', km: '12km', livello: 'E', guide: 'Andrea', past: false, immagine: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=800&auto=format&fit=crop', descrizione: 'Un grande classico delle Alpi Giulie. Saliremo al suggestivo borgo del Lussari per poi attaccare la Cima Cacciatore. Panorama a 360 gradi garantito su Austria e Slovenia.' },
+    { id: 2, data: 'Sabato 14 Novembre', titolo: 'Lago di Sorapis via sentiero 215', regione: 'Veneto', dPlus: '400m', km: '10km', livello: 'E', guide: 'Giada', past: false, immagine: 'https://images.unsplash.com/photo-1522616238699-a9314455acdb?q=80&w=800&auto=format&fit=crop', descrizione: 'Trekking fotografico verso uno dei laghi più iconici delle Dolomiti. Il sentiero presenta alcuni tratti esposti attrezzati con cordino metallico, ma tecnicamente semplici.' },
+    { id: 3, data: 'Sabato 14 Novembre', titolo: 'Rifugio Tuckett e Casinei', regione: 'Trentino', dPlus: '800m', km: '14km', livello: 'E', guide: 'Matteo', past: false, immagine: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?q=80&w=800&auto=format&fit=crop', descrizione: 'Immersione nel cuore delle Dolomiti di Brenta. Un giro ad anello spettacolare passando ai piedi di pareti verticali impressionanti.' },
+    { id: 4, data: 'Sabato 21 Novembre', titolo: 'Cima Carega dal Rifugio Revolto', regione: 'Veneto', dPlus: '1100m', km: '15km', livello: 'EE', guide: 'Andrea', past: false, immagine: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?q=80&w=800&auto=format&fit=crop', descrizione: 'Un\'escursione impegnativa nel gruppo delle Piccole Dolomiti. L\'ambiente roccioso e severo ci accompagnerà fino alla cima a quota 2.259m.' },
+    { id: 5, data: 'Sabato 21 Novembre', titolo: 'Rocciamelone (3538m)', regione: 'Piemonte', dPlus: '1500m', km: '9km', livello: 'EE', guide: 'Matteo', past: false, immagine: 'https://images.unsplash.com/photo-1602852260645-0e3636f0a3cc?q=80&w=800&auto=format&fit=crop', descrizione: 'Salita per gambe allenate alla cima santuario più alta d\'Europa. Quota elevata e panorama che spazia dal Monviso al Monte Rosa.' },
     // --- STORICO ---
-    { id: 6, data: 'Domenica 8 Novembre', titolo: 'Resegone via Canalone Bobbio', regione: 'Lombardia', dPlus: '1000m', km: '11km', livello: 'EE', guide: 'Matteo', past: true },
-    { id: 7, data: 'Domenica 8 Novembre', titolo: 'Cinque Torri e Nuvolau', regione: 'Veneto', dPlus: '600m', km: '9km', livello: 'E', guide: 'Giada', past: true },
-    { id: 8, data: 'Venerdì 30 Ottobre', titolo: 'Baita Segantini al tramonto', regione: 'Trentino', dPlus: '450m', km: '8km', livello: 'E', guide: 'Andrea', past: true },
-    { id: 9, data: 'Venerdì 30 Ottobre', titolo: 'Laghi di Fusine e Rifugio Zacchi', regione: 'FVG', dPlus: '500m', km: '10km', livello: 'E', guide: 'Giada', past: true }
+    { id: 6, data: 'Domenica 8 Novembre', titolo: 'Resegone via Canalone Bobbio', regione: 'Lombardia', dPlus: '1000m', km: '11km', livello: 'EE', guide: 'Matteo', past: true, immagine: 'https://images.unsplash.com/photo-1491555103944-7c647fd857e6?q=80&w=800&auto=format&fit=crop', descrizione: 'Salita tecnica sulla montagna simbolo di Lecco. Giornata tersa e gruppo fantastico, la cresta finale ci ha regalato emozioni.' },
+    { id: 7, data: 'Domenica 8 Novembre', titolo: 'Cinque Torri e Nuvolau', regione: 'Veneto', dPlus: '600m', km: '9km', livello: 'E', guide: 'Giada', past: true, immagine: 'https://images.unsplash.com/photo-1533471018593-9c884577af1c?q=80&w=800&auto=format&fit=crop', descrizione: 'Giro esplorativo tra i monoliti delle Cinque Torri e salita al rifugio più antico delle Dolomiti per un pranzo con vista.' },
+    { id: 8, data: 'Venerdì 30 Ottobre', titolo: 'Baita Segantini al tramonto', regione: 'Trentino', dPlus: '450m', km: '8km', livello: 'E', guide: 'Andrea', past: true, immagine: 'https://images.unsplash.com/photo-1433838552652-f9a46b332c40?q=80&w=800&auto=format&fit=crop', descrizione: 'Uscita serale per goderci l\'Enrosadira sulle Pale di San Martino. Freddo pungente ma ripagato dai colori del cielo.' },
+    { id: 9, data: 'Venerdì 30 Ottobre', titolo: 'Laghi di Fusine e Rifugio Zacchi', regione: 'FVG', dPlus: '500m', km: '10km', livello: 'E', guide: 'Giada', past: true, immagine: 'https://images.unsplash.com/photo-1542224566-6e85f2e10696?q=80&w=800&auto=format&fit=crop', descrizione: 'Foliage autunnale spettacolare attorno ai due laghi glaciali. Sentiero bagnato ma l\'atmosfera della foresta millenaria era magica.' }
   ];
 
-  // Stati per i filtri
+  // Stati per i filtri e per il popup (modale)
   const [activeTab, setActiveTab] = useState('programma'); // 'programma' o 'storico'
   const [activeRegion, setActiveRegion] = useState('Tutte');
+  const [selectedUscita, setSelectedUscita] = useState<typeof usciteData[0] | null>(null);
 
   // Estrai regioni uniche in base al tab attivo
   const filteredByTab = usciteData.filter(u => activeTab === 'programma' ? !u.past : u.past);
@@ -76,6 +77,28 @@ export default function ProssimeUscite() {
           font-size: 14px;
           color: #aaa;
         }
+        .action-btn {
+          padding: 10px 20px;
+          border-radius: 99px;
+          font-size: 12px;
+          font-weight: bold;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .action-btn.primary {
+          background-color: white;
+          color: black;
+          border: none;
+        }
+        .action-btn.secondary {
+          background-color: transparent;
+          color: white;
+          border: 1px solid rgba(255,255,255,0.4);
+        }
+        .action-btn:hover {
+          transform: scale(1.02);
+        }
         @media (max-width: 768px) {
           .uscita-row {
             grid-template-columns: 1fr;
@@ -119,7 +142,7 @@ export default function ProssimeUscite() {
               className={`filter-btn ${activeTab === 'storico' ? 'active' : ''}`}
               onClick={() => { setActiveTab('storico'); setActiveRegion('Tutte'); }}
             >
-              Storico Passate
+              Uscite Passate
             </button>
           </div>
         </div>
@@ -175,17 +198,14 @@ export default function ProssimeUscite() {
                       Con: <span style={{ color: 'white' }}>{uscita.guide}</span>
                     </div>
 
-                    {/* 4. Azione (Solo se in programma) */}
+                    {/* 4. Azione */}
                     <div>
-                      {!uscita.past ? (
-                        <button className="action-btn" style={{ backgroundColor: 'white', color: 'black', border: 'none', padding: '10px 20px', borderRadius: '99px', fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer' }}>
-                          Vedi Dettagli
-                        </button>
-                      ) : (
-                        <span style={{ fontSize: '12px', color: '#666', textTransform: 'uppercase', fontWeight: 'bold' }}>
-                          Conclusa
-                        </span>
-                      )}
+                      <button 
+                        className={`action-btn ${!uscita.past ? 'primary' : 'secondary'}`}
+                        onClick={() => setSelectedUscita(uscita)}
+                      >
+                        Vedi Dettagli
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -193,8 +213,92 @@ export default function ProssimeUscite() {
             </div>
           ))
         )}
-
       </div>
+
+      {/* MODALE DI DETTAGLIO (Appare solo se selectedUscita non è nullo) */}
+      {selectedUscita && (
+        <div 
+          style={{ 
+            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', 
+            backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', 
+            zIndex: 999, display: 'flex', justifyContent: 'center', alignItems: 'center', 
+            padding: '20px' 
+          }}
+          onClick={() => setSelectedUscita(null)} // Cliccando fuori si chiude
+        >
+          {/* Contenitore interno della modale */}
+          <div 
+            style={{ 
+              backgroundColor: '#111', width: '100%', maxWidth: '600px', 
+              borderRadius: '16px', overflow: 'hidden', position: 'relative',
+              border: '1px solid rgba(255,255,255,0.1)'
+            }}
+            onClick={e => e.stopPropagation()} // Evita che il clic dentro la modale la chiuda
+          >
+            {/* Tasto Chiudi (X) */}
+            <button 
+              onClick={() => setSelectedUscita(null)}
+              style={{
+                position: 'absolute', top: '15px', right: '15px', zIndex: 10,
+                backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', 
+                borderRadius: '50%', width: '36px', height: '36px', 
+                fontSize: '18px', cursor: 'pointer', display: 'flex', 
+                alignItems: 'center', justifyContent: 'center'
+              }}
+            >
+              ✕
+            </button>
+
+            {/* Immagine Copertina (o Mappa GPS finta in futuro) */}
+            <div style={{ width: '100%', height: '250px', backgroundColor: '#222' }}>
+              <img 
+                src={selectedUscita.immagine} 
+                alt={selectedUscita.titolo} 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            </div>
+
+            {/* Contenuto Modale */}
+            <div style={{ padding: '30px' }}>
+              <div style={{ color: 'rgb(223, 254, 2)', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 'bold', marginBottom: '10px' }}>
+                {selectedUscita.regione} • {selectedUscita.data}
+              </div>
+              <h2 style={{ fontSize: '2rem', margin: '0 0 20px 0', lineHeight: '1.1' }}>
+                {selectedUscita.titolo}
+              </h2>
+              
+              <div className="tech-specs" style={{ margin: '0 0 25px 0', fontSize: '16px', color: '#ccc' }}>
+                <span><strong>Dislivello:</strong> {selectedUscita.dPlus}</span>
+                <span><strong>Distanza:</strong> {selectedUscita.km}</span>
+                <span><strong>Difficoltà:</strong> {selectedUscita.livello}</span>
+              </div>
+              
+              <p style={{ fontSize: '1rem', lineHeight: '1.6', color: '#aaa', marginBottom: '30px' }}>
+                {selectedUscita.descrizione}
+              </p>
+              
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '14px', color: '#888' }}>
+                  Admin dell'uscita: <strong style={{ color: 'white' }}>{selectedUscita.guide}</strong>
+                </span>
+
+                {/* Tasto Azione nella Modale */}
+                {!selectedUscita.past ? (
+                  <button style={{ backgroundColor: 'rgb(223, 254, 2)', color: 'black', border: 'none', padding: '12px 24px', borderRadius: '99px', fontSize: '14px', fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer' }}>
+                    Entra nel gruppo
+                  </button>
+                ) : (
+                  <button style={{ backgroundColor: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.5)', padding: '12px 24px', borderRadius: '99px', fontSize: '14px', fontWeight: 'bold', textTransform: 'uppercase', cursor: 'pointer' }}>
+                    Scarica GPX
+                  </button>
+                )}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </main>
   );
 }
