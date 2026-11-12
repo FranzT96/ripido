@@ -46,9 +46,10 @@ export default function ProssimeUscite() {
       {/* BACKGROUND VERE LINEE TOPOGRAFICHE (File Locale) */}
       <div style={{
         position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1,
-        backgroundImage: 'url("/topografia.png")', /* Pesca il file dalla cartella public */
-        backgroundSize: 'cover', /* Usa 'cover' se è una foto intera, oppure '600px' se è un pattern piccolo che deve ripetersi */
-        opacity: 0.2 /* Regola questo valore: 0.1 è leggerissimo, 0.5 è molto visibile */
+        backgroundImage: 'url("/topografia.png")', 
+        backgroundSize: '400px', /* Valore fisso in pixel per non sgranare l'immagine (alzalo o abbassalo per ingrandire/rimpicciolire le curve) */
+        backgroundRepeat: 'repeat', /* Ripete l'immagine come una mattonella mantenendola nitidissima */
+        opacity: 0.2 
       }} />
       <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: '#0a0a0a', zIndex: -2 }} />
 
@@ -142,7 +143,7 @@ export default function ProssimeUscite() {
         </div>
 
         {/* Filtri Regione Testuali */}
-        <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginBottom: '50px', paddingBottom: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+        <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginBottom: '50px', paddingBottom: '20px', borderBottom: '2px solid rgba(255,255,255,0.25)' }}>
           {regioniDisponibili.map(regione => (
             <button 
               key={regione}
