@@ -47,8 +47,9 @@ export default function ProssimeUscite() {
       <div style={{
         position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1,
         backgroundImage: 'url("https://www.transparenttextures.com/patterns/topography.png")',
-        backgroundSize: '600px', /* Più è grande il valore, più larghe e realistiche sono le curve */
-        opacity: 0.35 /* Alzato un po' per farlo risaltare sul nero assoluto */
+        backgroundSize: '600px',
+        opacity: 0.15, /* Abbassiamo a 0.15 perché ora sono bianche e molto luminose */
+        filter: 'invert(1)' /* Questo inverte le linee da nere a bianche! */
       }} />
       <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: '#0a0a0a', zIndex: -2 }} />
 
