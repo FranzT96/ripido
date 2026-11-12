@@ -82,7 +82,7 @@ export default function ProssimeUscite() {
           padding: 15px;
           border-radius: 12px;
           cursor: pointer;
-          border-bottom: 1px solid rgba(255,255,255,0.05);
+          border-bottom: 2px solid rgba(255,255,255,0.15); /* Linea raddoppiata e più chiara */
           transition: background-color 0.2s ease;
         }
         .uscita-row:hover {
@@ -143,7 +143,7 @@ export default function ProssimeUscite() {
         </div>
 
         {/* Filtri Regione Testuali */}
-        <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginBottom: '50px', paddingBottom: '20px', borderBottom: '2px solid rgba(255,255,255,0.25)' }}>
+        <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', marginBottom: '50px', paddingBottom: '20px', borderBottom: '3px solid rgb(223, 254, 2)' }}>
           {regioniDisponibili.map(regione => (
             <button 
               key={regione}
