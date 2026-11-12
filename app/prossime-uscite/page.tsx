@@ -43,13 +43,14 @@ export default function ProssimeUscite() {
   return (
     <main style={{ position: 'relative', width: '100%', minHeight: '100dvh', color: 'white', padding: '40px 20px', fontFamily: 'sans-serif', overflow: 'hidden' }}>
       
-      {/* BACKGROUND LINEE TOPOGRAFICHE */}
+      {/* BACKGROUND LINEE TOPOGRAFICHE IN SVG (Sicuro, non si rompe mai) */}
       <div style={{
         position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1,
-        backgroundImage: 'url("https://www.transparenttextures.com/patterns/topography.png")',
-        opacity: 0.25 
+        // Questo è il codice di un pattern SVG di linee topografiche grigio scuro, codificato per funzionare nel CSS
+        backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'%3E%3Cpath fill=\'none\' stroke=\'rgba(255,255,255,0.06)\' stroke-width=\'1\' d=\'M0,50 Q25,25 50,50 T100,50 M0,25 Q25,0 50,25 T100,25 M0,75 Q25,50 50,75 T100,75 M0,100 Q25,75 50,100 T100,100 M25,0 Q50,25 25,50 T25,100 M75,0 Q100,25 75,50 T75,100\'/%3E%3C/svg%3E")',
+        backgroundSize: '150px 150px' // Rimpicciolisce o ingrandisce il pattern
       }} />
-      <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: '#080808', zIndex: -2 }} />
+      <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: '#0f0f0f', zIndex: -2 }} />
 
       <style>{`
         /* Stile per i filtri a pillola */
