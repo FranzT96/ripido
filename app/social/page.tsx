@@ -116,7 +116,7 @@ export default function Social() {
         {/* 2. Pulsanti d'azione (con loghi SVG) */}
         <div className="action-buttons animate-up" style={{ animationDelay: '0.4s' }}>
           <a 
-            href="https://instagram.com" 
+            href="https://www.instagram.com/ripido.official/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="btn-social"
