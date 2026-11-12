@@ -107,7 +107,7 @@ export default function RipidoHome() {
         </Link>
 
         <Link 
-          href="/eventi-speciali"
+          href="/eventi"
           className="ripido-btn"
           style={{ color: 'white', textDecoration: 'none', fontSize: '13px', fontWeight: '700', letterSpacing: '0.18em', textTransform: 'uppercase', padding: '10px 22px', border: '1px solid rgba(255, 255, 255, 0.4)', borderRadius: '9999px', backgroundColor: 'rgba(0, 0, 0, 0.25)', backdropFilter: 'blur(8px)', textShadow: '0 2px 8px rgba(0,0,0,0.6)', display: 'inline-block', whiteSpace: 'nowrap' }}
         >
