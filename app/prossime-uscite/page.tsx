@@ -237,11 +237,12 @@ export default function ProssimeUscite() {
           }}
           onClick={() => setSelectedUscita(null)} // Cliccando fuori si chiude
         >
-          {/* Contenitore interno della modale */}
+          {/* Contenitore interno della modale - ORA SCORRIBILE */}
           <div 
             style={{ 
               backgroundColor: '#111', width: '100%', maxWidth: '600px', 
-              borderRadius: '16px', overflow: 'hidden', position: 'relative',
+              maxHeight: '90vh', overflowY: 'auto', // Altezza massima e scroll interno 
+              borderRadius: '16px', position: 'relative',
               border: '1px solid rgba(255,255,255,0.1)'
             }}
             onClick={e => e.stopPropagation()} // Evita che il clic dentro la modale la chiuda
@@ -260,8 +261,8 @@ export default function ProssimeUscite() {
               ✕
             </button>
 
-            {/* Immagine Copertina (o Mappa GPS finta in futuro) */}
-            <div style={{ width: '100%', height: '250px', backgroundColor: '#222' }}>
+            {/* Immagine Copertina (Altezza abbassata da 250px a 180px) */}
+            <div style={{ width: '100%', height: '180px', backgroundColor: '#222' }}>
               <img 
                 src={selectedUscita.immagine} 
                 alt={selectedUscita.titolo} 
@@ -278,7 +279,7 @@ export default function ProssimeUscite() {
                 {selectedUscita.titolo}
               </h2>
               
-              {/* Dettagli strutturati stile WhatsApp */}
+              {/* Dettagli strutturati DINAMICI stile WhatsApp */}
               <div style={{ backgroundColor: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: '12px', marginBottom: '30px' }}>
                 
                 <h3 style={{ fontSize: '14px', color: 'rgb(223, 254, 2)', marginTop: 0, marginBottom: '15px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -286,38 +287,70 @@ export default function ProssimeUscite() {
                 </h3>
 
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '0.95rem', color: '#ccc', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-                    <span style={{ color: '#888' }}>Punto di partenza:</span>
-                    <span style={{ color: 'white', textAlign: 'right', maxWidth: '60%' }}>{selectedUscita.puntoPartenza || 'Da definire'}</span>
-                  </li>
-                  <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-                    <span style={{ color: '#888' }}>Punto di arrivo:</span>
-                    <span style={{ color: 'white', textAlign: 'right', maxWidth: '60%' }}>{selectedUscita.puntoArrivo || 'Da definire'}</span>
-                  </li>
-                  <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-                    <span style={{ color: '#888' }}>Tipologia:</span>
-                    <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.tipologia || '-'}</span>
-                  </li>
-                  <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-                    <span style={{ color: '#888' }}>Lunghezza:</span>
-                    <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.km}</span>
-                  </li>
-                  <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-                    <span style={{ color: '#888' }}>Dislivello positivo:</span>
-                    <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.dPlus}</span>
-                  </li>
-                  <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-                    <span style={{ color: '#888' }}>Tempo stimato:</span>
-                    <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.tempoStimato || '-'}</span>
-                  </li>
-                  <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-                    <span style={{ color: '#888' }}>Difficoltà:</span>
-                    <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.livello}</span>
-                  </li>
-                  <li style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '4px' }}>
-                    <span style={{ color: '#888' }}>Max partecipanti:</span>
-                    <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.maxPartecipanti || 'Nessun limite'}</span>
-                  </li>
+                  
+                  {selectedUscita.puntoPartenza && (
+                    <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                      <span style={{ color: '#888' }}>Punto di partenza:</span>
+                      <span style={{ color: 'white', textAlign: 'right', maxWidth: '60%' }}>{selectedUscita.puntoPartenza}</span>
+                    </li>
+                  )}
+                  
+                  {selectedUscita.puntoArrivo && (
+                    <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                      <span style={{ color: '#888' }}>Punto di arrivo:</span>
+                      <span style={{ color: 'white', textAlign: 'right', maxWidth: '60%' }}>{selectedUscita.puntoArrivo}</span>
+                    </li>
+                  )}
+                  
+                  {selectedUscita.tipologia && (
+                    <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                      <span style={{ color: '#888' }}>Tipologia:</span>
+                      <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.tipologia}</span>
+                    </li>
+                  )}
+
+                  {selectedUscita.km && (
+                    <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                      <span style={{ color: '#888' }}>Lunghezza:</span>
+                      <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.km}</span>
+                    </li>
+                  )}
+
+                  {selectedUscita.dPlus && (
+                    <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                      <span style={{ color: '#888' }}>Dislivello positivo:</span>
+                      <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.dPlus}</span>
+                    </li>
+                  )}
+
+                  {selectedUscita.tempoStimato && (
+                    <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                      <span style={{ color: '#888' }}>Tempo stimato:</span>
+                      <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.tempoStimato}</span>
+                    </li>
+                  )}
+
+                  {selectedUscita.livello && (
+                    <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                      <span style={{ color: '#888' }}>Difficoltà:</span>
+                      <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.livello}</span>
+                    </li>
+                  )}
+
+                  {selectedUscita.maxPartecipanti && (
+                    <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+                      <span style={{ color: '#888' }}>Max partecipanti:</span>
+                      <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.maxPartecipanti}</span>
+                    </li>
+                  )}
+
+                  {selectedUscita.pernottamento && (
+                    <li style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#888' }}>Pernottamento:</span>
+                      <span style={{ color: 'white', textAlign: 'right' }}>{selectedUscita.pernottamento}</span>
+                    </li>
+                  )}
+
                 </ul>
               </div>
               
