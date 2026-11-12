@@ -8,21 +8,21 @@ export default function ChiSiamo() {
       role: 'Co-Founder',
       desc: 'Appassionato di alta quota e fotografia. È la mente organizzativa dietro le spedizioni più ambiziose di Ripido, sempre alla ricerca della traccia perfetta per il gruppo.',
       align: 'left',
-      avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=300&auto=format&fit=crop'
+      avatar: '/matteo.jpg'
     },
     {
       name: 'Giada Tinazzi',
       role: 'Co-Founder',
       desc: 'L\'anima creativa e comunicativa del progetto. Trasforma ogni escursione in un racconto unico, unendo la fatica della salita alla bellezza dei paesaggi d\'alta quota.',
       align: 'right',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop'
+      avatar: '/giada.jpg'
     },
     {
       name: 'Andrea Bosco',
       role: 'Co-Founder',
       desc: 'Esperto di percorsi tecnici e sicurezza in montagna. Con lui nessuna cresta è troppo affilata: si assicura che il gruppo arrivi in cima e torni al rifugio col sorriso.',
       align: 'left',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop'
+      avatar: '/andrea.jpg'
     }
   ];
 
