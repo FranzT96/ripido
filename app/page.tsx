@@ -21,8 +21,9 @@ export default function RipidoHome() {
             top: 115px !important;
             left: 50% !important;
             transform: translateX(-50%) !important;
-            width: 100% !important;
+            width: 95vw !important;
             justify-content: center !important;
+            flex-wrap: wrap !important; /* Fa andare a capo i 4 pulsanti su due righe */
             gap: 8px !important;
             padding: 0 10px !important;
           }
@@ -37,10 +38,18 @@ export default function RipidoHome() {
             transform: translateX(-50%) !important;
             max-width: 95vw !important;
             width: 100% !important;
+            align-items: center !important; /* Centra anche il bottone bianco */
             text-align: center !important;
           }
           .ripido-motto-text {
             font-size: clamp(1.3rem, 6vw, 2.2rem) !important;
+          }
+          .cta-bottom {
+            align-self: center !important;
+            width: auto !important;
+            padding: 12px 24px !important;
+            font-size: 12px !important;
+            margin-top: 10px !important;
           }
         }
       `}</style>
