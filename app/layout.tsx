@@ -46,7 +46,7 @@ export default function RootLayout({
           {/* FOOTER GLOBALE (Appare su tutte le pagine) */}
           <footer style={{ backgroundColor: '#050505', borderTop: '1px solid rgba(255,255,255,0.05)', padding: '40px 20px', textAlign: 'center', color: '#666', fontSize: '12px' }}>
             <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              <div>&copy; {new Date().getFullYear()} Ripido. Tutti i diritti riservati.</div>
+              <div>&copy; 2026 Ripido. Tutti i diritti riservati.</div>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '25px' }}>
                 <a href="#" style={{ color: '#888', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Privacy Policy</a>
                 <a href="/social" style={{ color: '#888', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Entra nel gruppo</a>
