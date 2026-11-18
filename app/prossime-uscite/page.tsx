@@ -24,18 +24,22 @@ export default function ProssimeUscite() {
     { id: 7, data: 'Venerdì 30 Ottobre', isoDate: '2026-10-30', titolo: 'Laghi di Fusine e Rifugio Zacchi', regione: 'FVG', dPlus: '500m', km: '10km', livello: 'E', guide: 'Giada', immagine: 'https://images.unsplash.com/photo-1542224566-6e85f2e10696?q=80&w=300&auto=format&fit=crop' }
   ];
 
-  // Identifica l'inizio della giornata di oggi
-  const oggi = new Date();
-  oggi.setHours(0, 0, 0, 0);
+  // Inizializza i dati in uno stato locale (di default past: false per non bloccare la build di Vercel)
+  const [usciteData, setUsciteData] = useState(usciteDataRaw.map(u => ({ ...u, past: false })));
 
-  // Mappa i dati e calcola automaticamente "past" comparando la data
-  const usciteData = usciteDataRaw.map(uscita => {
-    const dataUscita = new Date(uscita.isoDate);
-    return {
-      ...uscita,
-      past: dataUscita < oggi
-    };
-  });
+  // Calcola la data reale SOLO lato client (browser), evitando l'errore in fase di build
+  useEffect(() => {
+    const oggi = new Date();
+    oggi.setHours(0, 0, 0, 0);
+
+    setUsciteData(usciteDataRaw.map(uscita => {
+      const dataUscita = new Date(uscita.isoDate);
+      return {
+        ...uscita,
+        past: dataUscita < oggi
+      };
+    }));
+  }, []);
 
   const [activeTab, setActiveTab] = useState('programma'); 
   const [activeRegion, setActiveRegion] = useState('Tutte');
