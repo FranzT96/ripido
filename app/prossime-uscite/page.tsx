@@ -3,28 +3,39 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 export default function ProssimeUscite() {
-  // Dati di esempio
-  const usciteData = [
-    // --- IN PROGRAMMA ---
+  // Dati di base (aggiunto isoDate, rimosso past manuale)
+  const usciteDataRaw = [
     { 
-      id: 1, data: 'Domenica 15 Novembre', titolo: 'Bosco degli Eroi', regione: 'Veneto', 
-      dPlus: '400m', km: '10km', livello: 'E', guide: 'Andrea', past: false, 
+      id: 1, data: 'Domenica 15 Novembre', isoDate: '2026-11-15', titolo: 'Bosco degli Eroi', regione: 'Veneto', 
+      dPlus: '400m', km: '10km', livello: 'E', guide: 'Andrea', 
       immagine: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=300&auto=format&fit=crop',
       maxPartecipanti: 15, pernottamento: 'No', puntoPartenza: 'Rifugio Bocchette, Seren del Grappa', puntoArrivo: 'Rifugio Bocchette', tipologia: 'Anello', tempoStimato: '3 h'
     },
     { 
-      id: 2, data: 'Domenica 15 Novembre', titolo: 'Lago di Sorapis via sentiero 215', regione: 'Veneto', 
-      dPlus: '400m', km: '10km', livello: 'E', guide: 'Giada', past: false, 
+      id: 2, data: 'Domenica 15 Novembre', isoDate: '2026-11-15', titolo: 'Lago di Sorapis via sentiero 215', regione: 'Veneto', 
+      dPlus: '400m', km: '10km', livello: 'E', guide: 'Giada', 
       immagine: 'https://images.unsplash.com/photo-1522616238699-a9314455acdb?q=80&w=300&auto=format&fit=crop',
       maxPartecipanti: null, pernottamento: 'No', puntoPartenza: 'Passo Tre Croci', puntoArrivo: 'Passo Tre Croci', tipologia: 'Andata e ritorno', tempoStimato: '4.5 h'
     },
-    { id: 3, data: 'Sabato 21 Novembre', titolo: 'Rifugio Tuckett e Casinei', regione: 'Trentino', dPlus: '800m', km: '14km', livello: 'E', guide: 'Matteo', past: false, immagine: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?q=80&w=300&auto=format&fit=crop' },
-    { id: 4, data: 'Sabato 21 Novembre', titolo: 'Cima Carega dal Rifugio Revolto', regione: 'Veneto', dPlus: '1100m', km: '15km', livello: 'EE', guide: 'Andrea', past: false, immagine: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?q=80&w=300&auto=format&fit=crop' },
-    { id: 5, data: 'Domenica 22 Novembre', titolo: 'Rocciamelone (3538m)', regione: 'Piemonte', dPlus: '1500m', km: '9km', livello: 'EE', guide: 'Matteo', past: false, immagine: 'https://images.unsplash.com/photo-1602852260645-0e3636f0a3cc?q=80&w=300&auto=format&fit=crop' },
-    // --- STORICO ---
-    { id: 6, data: 'Domenica 8 Novembre', titolo: 'Resegone via Canalone Bobbio', regione: 'Lombardia', dPlus: '1000m', km: '11km', livello: 'EE', guide: 'Matteo', past: true, immagine: 'https://images.unsplash.com/photo-1491555103944-7c647fd857e6?q=80&w=300&auto=format&fit=crop' },
-    { id: 7, data: 'Venerdì 30 Ottobre', titolo: 'Laghi di Fusine e Rifugio Zacchi', regione: 'FVG', dPlus: '500m', km: '10km', livello: 'E', guide: 'Giada', past: true, immagine: 'https://images.unsplash.com/photo-1542224566-6e85f2e10696?q=80&w=300&auto=format&fit=crop' }
+    { id: 3, data: 'Sabato 21 Novembre', isoDate: '2026-11-21', titolo: 'Rifugio Tuckett e Casinei', regione: 'Trentino', dPlus: '800m', km: '14km', livello: 'E', guide: 'Matteo', immagine: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?q=80&w=300&auto=format&fit=crop' },
+    { id: 4, data: 'Sabato 21 Novembre', isoDate: '2026-11-21', titolo: 'Cima Carega dal Rifugio Revolto', regione: 'Veneto', dPlus: '1100m', km: '15km', livello: 'EE', guide: 'Andrea', immagine: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?q=80&w=300&auto=format&fit=crop' },
+    { id: 5, data: 'Domenica 22 Novembre', isoDate: '2026-11-22', titolo: 'Rocciamelone (3538m)', regione: 'Piemonte', dPlus: '1500m', km: '9km', livello: 'EE', guide: 'Matteo', immagine: 'https://images.unsplash.com/photo-1602852260645-0e3636f0a3cc?q=80&w=300&auto=format&fit=crop' },
+    { id: 6, data: 'Domenica 8 Novembre', isoDate: '2026-11-08', titolo: 'Resegone via Canalone Bobbio', regione: 'Lombardia', dPlus: '1000m', km: '11km', livello: 'EE', guide: 'Matteo', immagine: 'https://images.unsplash.com/photo-1491555103944-7c647fd857e6?q=80&w=300&auto=format&fit=crop' },
+    { id: 7, data: 'Venerdì 30 Ottobre', isoDate: '2026-10-30', titolo: 'Laghi di Fusine e Rifugio Zacchi', regione: 'FVG', dPlus: '500m', km: '10km', livello: 'E', guide: 'Giada', immagine: 'https://images.unsplash.com/photo-1542224566-6e85f2e10696?q=80&w=300&auto=format&fit=crop' }
   ];
+
+  // Identifica l'inizio della giornata di oggi
+  const oggi = new Date();
+  oggi.setHours(0, 0, 0, 0);
+
+  // Mappa i dati e calcola automaticamente "past" comparando la data
+  const usciteData = usciteDataRaw.map(uscita => {
+    const dataUscita = new Date(uscita.isoDate);
+    return {
+      ...uscita,
+      past: dataUscita < oggi
+    };
+  });
 
   const [activeTab, setActiveTab] = useState('programma'); 
   const [activeRegion, setActiveRegion] = useState('Tutte');
