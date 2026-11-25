@@ -48,8 +48,9 @@ export default function RootLayout({
             <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '15px' }}>
               <div>&copy; 2026 Ripido. Tutti i diritti riservati.</div>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '25px' }}>
-                <a href="#" style={{ color: '#888', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Privacy Policy</a>
-                <Link href="/social" style={{ color: '#888', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Entra nel gruppo</Link>
+                <Link href="/privacy" style={{ color: '#888', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Privacy Policy
+                </Link>
               </div>
             </div>
           </footer>

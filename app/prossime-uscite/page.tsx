@@ -114,7 +114,17 @@ export default function ProssimeUscite() {
             : b.isoDate.localeCompare(a.isoDate)
         )
     : [];
-  const regioniDisponibili = ['Tutte', ...Array.from(new Set(filteredByTab.map(u => u.regione)))];
+  const conteggioRegioni = filteredByTab.reduce((acc, uscita) => {
+    acc[uscita.regione] = (acc[uscita.regione] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const regioniOrdinate = Object.keys(conteggioRegioni).sort((a, b) => {
+    const diff = conteggioRegioni[b] - conteggioRegioni[a];
+    if (diff !== 0) return diff;
+    return a.localeCompare(b, 'it');
+  });
+
   const usciteVisualizzate = filteredByTab.filter(u => activeRegion === 'Tutte' || u.regione === activeRegion);
 
   return (
@@ -136,14 +146,47 @@ export default function ProssimeUscite() {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          flex-wrap: wrap;
-          gap: 20px;
+          gap: 24px;
           padding: 16px 20px;
           margin-bottom: 45px;
           border-radius: 18px;
           background: rgba(20, 20, 20, 0.65);
           backdrop-filter: blur(12px);
           border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .regions-filter-wrapper {
+          display: flex;
+          align-items: center;
+          min-width: 0;
+          max-width: 100%;
+          margin-left: auto;
+        }
+
+        .regions-divider {
+          width: 1px;
+          height: 18px;
+          background: rgba(255, 255, 255, 0.16);
+          margin: 0 8px;
+          flex-shrink: 0;
+        }
+
+        .regions-scroll {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          overflow-x: auto;
+          flex-wrap: nowrap;
+          white-space: nowrap;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+          -webkit-overflow-scrolling: touch;
+          padding-right: 22px;
+          mask-image: linear-gradient(to right, black calc(100% - 22px), transparent 100%);
+          -webkit-mask-image: linear-gradient(to right, black calc(100% - 22px), transparent 100%);
+        }
+        .regions-scroll::-webkit-scrollbar {
+          display: none;
         }
 
         .filter-btn {
@@ -180,6 +223,11 @@ export default function ProssimeUscite() {
           letter-spacing: 0.1em;
           color: #777;
           transition: color 0.2s ease;
+          flex-shrink: 0;
+          white-space: nowrap;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
         }
         .region-pill:hover {
           color: #ddd;
@@ -269,8 +317,13 @@ export default function ProssimeUscite() {
           }
           .controls-bar {
             flex-direction: column;
-            align-items: flex-start;
+            align-items: stretch;
+            gap: 14px;
             padding: 16px;
+          }
+          .regions-filter-wrapper {
+            margin-left: 0;
+            width: 100%;
           }
           .stats-strip {
             grid-template-columns: repeat(2, 1fr);
@@ -300,9 +353,9 @@ export default function ProssimeUscite() {
           </p>
         </div>
           
-        {/* Barra Filtri Unificata (Tab + Regioni) */}
+        {/* Barra Filtri Unificata (Tab + Tutte fisso + Regioni scorrevoli) */}
         <div className="controls-bar">
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '10px', flexShrink: 0, flexWrap: 'wrap' }}>
             <button className={`filter-btn ${activeTab === 'programma' ? 'active' : ''}`} onClick={() => { setActiveTab('programma'); setActiveRegion('Tutte'); }}>
               In Programma
             </button>
@@ -311,16 +364,28 @@ export default function ProssimeUscite() {
             </button>
           </div>
 
-          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-            {regioniDisponibili.map(regione => (
-              <button 
-                key={regione}
-                className={`region-pill ${activeRegion === regione ? 'active' : ''}`}
-                onClick={() => setActiveRegion(regione)}
-              >
-                {regione}
-              </button>
-            ))}
+          <div className="regions-filter-wrapper">
+            <button
+              className={`region-pill ${activeRegion === 'Tutte' ? 'active' : ''}`}
+              onClick={() => setActiveRegion('Tutte')}
+            >
+              Tutte
+            </button>
+
+            {regioniOrdinate.length > 0 && <div className="regions-divider" />}
+
+            <div className="regions-scroll">
+              {regioniOrdinate.map(regione => (
+                <button 
+                  key={regione}
+                  className={`region-pill ${activeRegion === regione ? 'active' : ''}`}
+                  onClick={() => setActiveRegion(regione)}
+                >
+                  <span>{regione}</span>
+                  <span style={{ fontSize: '10px', opacity: 0.6 }}>({conteggioRegioni[regione]})</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
