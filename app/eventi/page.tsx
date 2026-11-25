@@ -101,6 +101,16 @@ export default function EventiSpeciali() {
     setFormError(null);
   }, [selectedEvento?.id]);
 
+  // Sbianca sempre i campi ogni volta che la modale del modulo viene chiusa
+  useEffect(() => {
+    if (!showForm) {
+      setNome('');
+      setCognome('');
+      setTelefono('');
+      setFormError(null);
+    }
+  }, [showForm]);
+
   // Blocco scroll e gestione tasto ESC a livelli (prima chiude il popup davanti, poi la scheda evento)
   useEffect(() => {
     if (!selectedEvento) return;
