@@ -145,7 +145,7 @@ export default function RipidoHome() {
       <div className="ripido-motto-box" style={{ position: 'absolute', bottom: '150px', left: '40px', zIndex: 10, maxWidth: 'min(90vw, 800px)', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '20px' }}>
         <h1 className="ripido-motto-text" style={{ color: 'white', fontSize: 'clamp(1.5rem, 3.5vw, 3.5rem)', fontWeight: 'bold', lineHeight: '1.2', margin: 0, textShadow: '2px 4px 15px rgba(0,0,0,0.9)', whiteSpace: 'nowrap' }}>
           The mountains are calling.<br />
-          <span style={{ fontFamily: 'var(--font-playfair), serif', fontStyle: 'italic', fontWeight: '400' }}>Your friends aren't.</span><br />
+          <span style={{ fontStyle: 'italic', fontWeight: '300' }}>Your friends aren't.</span><br />
           <span style={{ color: 'rgb(223, 254, 2)' }}>Find your people.</span>
         </h1>
         
