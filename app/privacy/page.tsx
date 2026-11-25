@@ -79,7 +79,7 @@ export default function PrivacyPolicy() {
               <strong>Contatti volontari su piattaforme esterne (Instagram e WhatsApp):</strong> cliccando sui collegamenti verso Instagram o accedendo ai gruppi WhatsApp della community, l&apos;utente condivide volontariamente il proprio profilo, nome, numero di telefono (visibile agli altri membri del gruppo WhatsApp secondo le impostazioni dell&apos;app) e il contenuto dei messaggi inviati.
             </li>
             <li>
-              <strong>Partecipazione a uscite ed eventi speciali:</strong> qualora l&apos;utente compili moduli sul sito per prenotare un posto a escursioni a numero chiuso o eventi comunitari a rimborso spese vive, vengono raccolti i soli dati strettamente necessari all&apos;organizzazione logistica (es. nome, cognome, recapito email o telefonico ed eventuali note organizzative).
+              <strong>Adesione agli eventi speciali:</strong> quando l&apos;utente compila il modulo per richiedere l&apos;accesso al gruppo WhatsApp dedicato a un evento speciale, vengono raccolti esclusivamente <strong>nome, cognome e numero di telefono</strong>, utilizzati dai referenti al solo scopo di verificare l&apos;identità del richiedente tra le richieste d&apos;ingresso su WhatsApp e coordinare la partecipazione.
             </li>
           </ul>
         </section>
