@@ -31,14 +31,17 @@ export default function EventiSpeciali() {
   const [activeTab, setActiveTab] = useState<'programma' | 'storico'>('programma');
   const [selectedEvento, setSelectedEvento] = useState<EventoView | null>(null);
 
-  // Stati del modulo di iscrizione
+  // Stati modale di iscrizione e conferma (in primo piano sopra l'evento)
   const [showForm, setShowForm] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const [popupBlocked, setPopupBlocked] = useState(false);
+  const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
+
   const [nome, setNome] = useState('');
   const [cognome, setCognome] = useState('');
   const [telefono, setTelefono] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const oggi = new Date();
@@ -60,7 +63,6 @@ export default function EventiSpeciali() {
 
     fetchEventi();
 
-    // Aggiorna la barra in tempo reale per tutti gli utenti collegati
     const channel = supabase
       .channel('eventi-speciali-live')
       .on(
@@ -86,16 +88,21 @@ export default function EventiSpeciali() {
     past: todayIso ? evento.data_fine < todayIso : false
   }));
 
-  // Reset del modulo ogni volta che si cambia o si chiude la modale
+  // Reset stati form quando si cambia o si chiude la scheda evento
   useEffect(() => {
     setShowForm(false);
+    setRegistrationSuccess(false);
+    setPopupBlocked(false);
+    setRedirectUrl(null);
     setNome('');
     setCognome('');
     setTelefono('');
     setSubmitting(false);
     setFormError(null);
-    setRedirectUrl(null);
+  }, [selectedEvento?.id]);
 
+  // Blocco scroll e gestione tasto ESC a livelli (prima chiude il popup davanti, poi la scheda evento)
+  useEffect(() => {
     if (!selectedEvento) return;
 
     const prevBodyOverflow = document.body.style.overflow;
@@ -104,7 +111,17 @@ export default function EventiSpeciali() {
     document.documentElement.style.overflow = 'hidden';
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setSelectedEvento(null);
+      if (e.key === 'Escape') {
+        if (registrationSuccess) {
+          setRegistrationSuccess(false);
+          setShowForm(false);
+        } else if (showForm) {
+          setShowForm(false);
+          setFormError(null);
+        } else {
+          setSelectedEvento(null);
+        }
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
 
@@ -113,9 +130,8 @@ export default function EventiSpeciali() {
       document.documentElement.style.overflow = prevHtmlOverflow;
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [selectedEvento?.id]);
+  }, [selectedEvento, showForm, registrationSuccess]);
 
-  // Helper per calcolare avanzamento (a step di 1/capienza), colore ed etichetta della barra unica
   function getBarMeta(evento: EventoView) {
     const capienza = Math.max(1, evento.capienza_gruppo || 20);
 
@@ -143,11 +159,11 @@ export default function EventiSpeciali() {
     const percentage = Math.round(ratio * 100);
     const isWaitlist = evento.iscritti_attivi >= capienza;
 
-    let color = '#22c55e'; // Verde (<= 50%)
+    let color = '#22c55e';
     if (ratio > 0.85) {
-      color = '#ef4444'; // Rosso (> 85%)
+      color = '#ef4444';
     } else if (ratio > 0.5) {
-      color = '#eab308'; // Giallo (51% - 85%)
+      color = '#eab308';
     }
 
     let statusLabel = 'Posti disponibili';
@@ -164,21 +180,21 @@ export default function EventiSpeciali() {
 
   async function handleIscrizione(e: React.FormEvent) {
     e.preventDefault();
-    if (!selectedEvento) return;
+    if (!selectedEvento || submitting) return;
 
     const cleanNome = nome.trim();
     const cleanCognome = cognome.trim();
     const cleanTelefono = telefono.trim();
+    const soloCifre = cleanTelefono.replace(/[^0-9]/g, '');
 
-    if (!cleanNome || !cleanCognome || cleanTelefono.length < 6) {
-      setFormError('Compila nome, cognome e un numero di telefono valido.');
+    if (!cleanNome || !cleanCognome || soloCifre.length < 7) {
+      setFormError('Inserisci nome, cognome e un numero di telefono valido.');
       return;
     }
 
     setSubmitting(true);
     setFormError(null);
 
-    // IMPORTANTE: non concatenare .select() perché per GDPR gli utenti anonimi hanno solo permesso INSERT
     const { error } = await supabase
       .from('iscrizioni_eventi')
       .insert([
@@ -193,11 +209,15 @@ export default function EventiSpeciali() {
 
     if (error) {
       setSubmitting(false);
-      setFormError('Impossibile registrare la richiesta (le iscrizioni potrebbero essere state chiuse). Riprova.');
+      if (error.code === '23505' || error.message?.includes('DUPLICATE_REGISTRATION')) {
+        setFormError('Risulta già un\'iscrizione registrata per questo evento con questi dati.');
+      } else {
+        setFormError('Impossibile registrare la richiesta (le iscrizioni potrebbero essere chiuse). Riprova.');
+      }
       return;
     }
 
-    // Aggiorna subito la barra di +1 tacca lato client
+    // Aggiorna subito la barra lato client in attesa dell'evento Realtime
     setEventiRaw(prev =>
       prev.map(ev =>
         ev.id === selectedEvento.id
@@ -209,13 +229,25 @@ export default function EventiSpeciali() {
       prev ? { ...prev, iscritti_attivi: prev.iscritti_attivi + 1 } : null
     );
 
-    setSubmitting(false);
-
     const targetWhatsapp = selectedEvento.whatsapp_invite_url || '/social';
     setRedirectUrl(targetWhatsapp);
 
-    // Reindirizza direttamente al gruppo WhatsApp
-    window.location.href = targetWhatsapp;
+    // Apre WhatsApp in un nuovo tab e sposta il focus lì
+    const newWin = window.open(targetWhatsapp, '_blank', 'noopener,noreferrer');
+    setPopupBlocked(!newWin);
+
+    setSubmitting(false);
+    setShowForm(false);
+    setRegistrationSuccess(true);
+    setNome('');
+    setCognome('');
+    setTelefono('');
+  }
+
+  function closeConfirmation() {
+    setRegistrationSuccess(false);
+    setPopupBlocked(false);
+    setRedirectUrl(null);
   }
 
   const countProgramma = todayIso ? eventiData.filter(e => !e.past).length : 0;
@@ -330,7 +362,6 @@ export default function EventiSpeciali() {
           color: black;
           transform: translate(2px, -2px);
         }
-        /* Barra unica continua con transizione morbida */
         .status-bar-track {
           width: 100%;
           height: 6px;
@@ -356,11 +387,17 @@ export default function EventiSpeciali() {
           padding: 14px 12px;
           text-align: center;
         }
+        .form-two-cols {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          margin-bottom: 14px;
+        }
         .ripido-input {
           width: 100%;
           box-sizing: border-box;
-          background: rgba(0, 0, 0, 0.5);
-          border: 1px solid rgba(255, 255, 255, 0.16);
+          background: rgba(0, 0, 0, 0.55);
+          border: 1px solid rgba(255, 255, 255, 0.18);
           border-radius: 12px;
           padding: 12px 14px;
           color: white;
@@ -385,6 +422,11 @@ export default function EventiSpeciali() {
             padding: 16px;
           }
           .stats-strip-3 {
+            grid-template-columns: 1fr;
+          }
+        }
+        @media (max-width: 520px) {
+          .form-two-cols {
             grid-template-columns: 1fr;
           }
         }
@@ -465,7 +507,6 @@ export default function EventiSpeciali() {
                   }} />
 
                   <div style={{ position: 'relative', zIndex: 2, height: '100%', padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    {/* Riga superiore: Data + Stato + Freccia */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px' }}>
                       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         <span style={{
@@ -569,7 +610,6 @@ export default function EventiSpeciali() {
                       </div>
                     </div>
 
-                    {/* Riga inferiore */}
                     <div>
                       <div style={{ color: 'rgb(223, 254, 2)', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '8px' }}>
                         {evento.luogo}
@@ -579,7 +619,6 @@ export default function EventiSpeciali() {
                         {evento.titolo}
                       </h2>
 
-                      {/* Barra Semaforo Unica Continua */}
                       {!evento.past && (
                         <div style={{ marginTop: '16px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#bbb', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.08em', marginBottom: '7px' }}>
@@ -630,7 +669,7 @@ export default function EventiSpeciali() {
         )}
       </div>
 
-      {/* MODALE DETTAGLIO "CINEMATIC" + MODULO ISCRIZIONE */}
+      {/* LIVELLO 1: MODALE DETTAGLIO EVENTO */}
       {selectedEvento && (() => {
         const modalBar = getBarMeta(selectedEvento);
 
@@ -702,7 +741,6 @@ export default function EventiSpeciali() {
                   </div>
                 </div>
 
-                {/* Barra continua nella modale */}
                 {!selectedEvento.past && (
                   <div style={{ marginBottom: '22px' }}>
                     <div className="status-bar-track" style={{ height: '7px', backgroundColor: 'rgba(255, 255, 255, 0.12)' }}>
@@ -731,7 +769,7 @@ export default function EventiSpeciali() {
                   {selectedEvento.descrizione}
                 </div>
 
-                {/* SEZIONE AZIONE / MODULO DI ISCRIZIONE */}
+                {/* FOOTER COMPACT DELLA SCHEDA EVENTO */}
                 {!selectedEvento.past ? (
                   selectedEvento.stato_iscrizioni === 'sold_out' ? (
                     <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '15px' }}>
@@ -751,22 +789,7 @@ export default function EventiSpeciali() {
                         Iscrizioni Chiuse
                       </button>
                     </div>
-                  ) : redirectUrl ? (
-                    <div style={{ backgroundColor: 'rgba(223, 254, 2, 0.08)', border: '1px solid rgba(223, 254, 2, 0.35)', borderRadius: '16px', padding: '22px', textAlign: 'center' }}>
-                      <div style={{ color: 'rgb(223, 254, 2)', fontWeight: 800, fontSize: '1.05rem', marginBottom: '8px' }}>
-                        Richiesta registrata!
-                      </div>
-                      <p style={{ color: '#ccc', fontSize: '0.9rem', margin: '0 0 16px 0', lineHeight: 1.5 }}>
-                        Ti stiamo reindirizzando al gruppo WhatsApp dell&apos;evento per l&apos;approvazione da parte degli admin.
-                      </p>
-                      <a
-                        href={redirectUrl}
-                        style={{ backgroundColor: 'rgb(223, 254, 2)', color: 'black', textDecoration: 'none', padding: '12px 24px', borderRadius: '99px', fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', display: 'inline-block' }}
-                      >
-                        Apri WhatsApp manualmente &rarr;
-                      </a>
-                    </div>
-                  ) : !showForm ? (
+                  ) : (
                     <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
                       {modalBar.isWaitlist && (
                         <div style={{
@@ -779,7 +802,7 @@ export default function EventiSpeciali() {
                           lineHeight: 1.5,
                           marginBottom: '16px'
                         }}>
-                          Numero massimo raggiunto: puoi comunque iscriverti per restare in coda di approvazione su WhatsApp (lista d&apos;attesa) nel caso si liberino posti.
+                          Numero massimo raggiunto: puoi comunque iscriverti per entrare in lista d&apos;attesa su WhatsApp nel caso si liberino posti.
                         </div>
                       )}
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '15px' }}>
@@ -787,7 +810,10 @@ export default function EventiSpeciali() {
                           {selectedEvento.prezzo} <span style={{ fontSize: '0.9rem', color: '#888', fontWeight: 400 }}>/ persona</span>
                         </div>
                         <button
-                          onClick={() => setShowForm(true)}
+                          onClick={() => {
+                            setFormError(null);
+                            setShowForm(true);
+                          }}
                           style={{
                             backgroundColor: 'rgb(223, 254, 2)',
                             color: 'black',
@@ -805,118 +831,6 @@ export default function EventiSpeciali() {
                         </button>
                       </div>
                     </div>
-                  ) : (
-                    <form
-                      onSubmit={handleIscrizione}
-                      style={{
-                        backgroundColor: 'rgba(255,255,255,0.04)',
-                        border: '1px solid rgba(223, 254, 2, 0.3)',
-                        borderRadius: '18px',
-                        padding: '22px'
-                      }}
-                    >
-                      <h3 style={{ margin: '0 0 6px 0', fontSize: '1.05rem', fontWeight: 800, color: 'white' }}>
-                        {modalBar.isWaitlist ? 'Richiedi ingresso in lista d\'attesa' : 'Iscriviti all\'evento'}
-                      </h3>
-                      <p style={{ margin: '0 0 18px 0', fontSize: '0.85rem', color: '#aaa', lineHeight: 1.5 }}>
-                        {modalBar.isWaitlist
-                          ? 'Numero massimo raggiunto: invia i tuoi dati e richiedi l\'accesso al gruppo WhatsApp, resterai in attesa di approvazione se si liberano posti.'
-                          : 'Inserisci i tuoi dati per richiedere l\'ingresso nel gruppo WhatsApp operativo dell\'evento (i dettagli sulla quota spese verranno gestiti nella chat).'}
-                      </p>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-                        <div>
-                          <label style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#aaa', marginBottom: '6px', fontWeight: 700 }}>
-                            Nome *
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            className="ripido-input"
-                            placeholder="Es. Marco"
-                            value={nome}
-                            onChange={e => setNome(e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#aaa', marginBottom: '6px', fontWeight: 700 }}>
-                            Cognome *
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            className="ripido-input"
-                            placeholder="Es. Rossi"
-                            value={cognome}
-                            onChange={e => setCognome(e.target.value)}
-                          />
-                        </div>
-                      </div>
-
-                      <div style={{ marginBottom: '12px' }}>
-                        <label style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#aaa', marginBottom: '6px', fontWeight: 700 }}>
-                          Numero di Telefono (WhatsApp) *
-                        </label>
-                        <input
-                          type="tel"
-                          required
-                          className="ripido-input"
-                          placeholder="+39 333 1234567"
-                          value={telefono}
-                          onChange={e => setTelefono(e.target.value)}
-                        />
-                      </div>
-
-                      <p style={{ fontSize: '11px', color: '#777', lineHeight: 1.5, margin: '0 0 16px 0' }}>
-                        Usiamo il numero esclusivamente per associare la tua richiesta su WhatsApp (anche in caso di nickname) e coordinare l&apos;uscita, nel rispetto della <Link href="/privacy" style={{ color: '#aaa', textDecoration: 'underline' }}>Privacy Policy</Link>.
-                      </p>
-
-                      {formError && (
-                        <div style={{ color: '#ff6b6b', fontSize: '0.85rem', marginBottom: '14px', fontWeight: 600 }}>
-                          {formError}
-                        </div>
-                      )}
-
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', flexWrap: 'wrap' }}>
-                        <button
-                          type="button"
-                          onClick={() => { setShowForm(false); setFormError(null); }}
-                          style={{
-                            backgroundColor: 'transparent',
-                            color: '#ccc',
-                            border: '1px solid rgba(255,255,255,0.25)',
-                            padding: '12px 20px',
-                            borderRadius: '99px',
-                            fontSize: '12px',
-                            fontWeight: 700,
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.06em',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          Annulla
-                        </button>
-                        <button
-                          type="submit"
-                          disabled={submitting}
-                          style={{
-                            backgroundColor: 'rgb(223, 254, 2)',
-                            color: 'black',
-                            border: 'none',
-                            padding: '12px 24px',
-                            borderRadius: '99px',
-                            fontSize: '12px',
-                            fontWeight: 800,
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.06em',
-                            cursor: submitting ? 'wait' : 'pointer',
-                            opacity: submitting ? 0.7 : 1
-                          }}
-                        >
-                          {submitting ? 'Invio...' : 'Iscriviti ed entra nel gruppo'}
-                        </button>
-                      </div>
-                    </form>
                   )
                 ) : (
                   <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '15px' }}>
@@ -941,6 +855,224 @@ export default function EventiSpeciali() {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* LIVELLO 2: MODALE CENTRATA DAVANTI ALL'EVENTO (MODULO O CONFERMA CON TASTO OK) */}
+      {selectedEvento && (showForm || registrationSuccess) && (() => {
+        const modalBar = getBarMeta(selectedEvento);
+
+        return (
+          <div
+            style={{
+              position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+              backgroundColor: 'rgba(0, 0, 0, 0.78)', backdropFilter: 'blur(8px)',
+              zIndex: 1100, display: 'flex', justifyContent: 'center', alignItems: 'center',
+              padding: '20px'
+            }}
+            onClick={() => {
+              if (registrationSuccess) {
+                closeConfirmation();
+              } else if (!submitting) {
+                setShowForm(false);
+                setFormError(null);
+              }
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: '#141414',
+                width: '100%',
+                maxWidth: '480px',
+                borderRadius: '22px',
+                padding: '28px',
+                border: '1px solid rgba(223, 254, 2, 0.35)',
+                boxShadow: '0 30px 70px rgba(0, 0, 0, 0.9)',
+                position: 'relative'
+              }}
+              onClick={e => e.stopPropagation()}
+            >
+              {registrationSuccess ? (
+                /* MESSAGGIO DI CONFERMA CON TASTO OK */
+                <div style={{ textAlign: 'center', padding: '8px 4px' }}>
+                  <div style={{
+                    width: '52px', height: '52px', borderRadius: '50%',
+                    backgroundColor: 'rgba(223, 254, 2, 0.14)',
+                    border: '1px solid rgba(223, 254, 2, 0.5)',
+                    color: 'rgb(223, 254, 2)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    margin: '0 auto 16px', fontSize: '24px', fontWeight: 800
+                  }}>
+                    ✓
+                  </div>
+
+                  <h3 style={{ margin: '0 0 10px 0', fontSize: '1.35rem', fontWeight: 800, color: 'white' }}>
+                    Iscrizione registrata!
+                  </h3>
+
+                  <p style={{ color: '#bbb', fontSize: '0.92rem', lineHeight: 1.6, margin: '0 0 22px 0' }}>
+                    La tua richiesta per <strong style={{ color: 'white' }}>{selectedEvento.titolo}</strong> è stata salvata. Completa l&apos;ingresso nel gruppo WhatsApp che si è aperto nell&apos;altra scheda per restare in attesa di approvazione dagli admin.
+                  </p>
+
+                  {popupBlocked && redirectUrl && (
+                    <div style={{ marginBottom: '18px' }}>
+                      <a
+                        href={redirectUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'inline-block',
+                          color: 'rgb(223, 254, 2)',
+                          fontSize: '0.85rem',
+                          fontWeight: 700,
+                          textDecoration: 'underline'
+                        }}
+                      >
+                        Il browser ha bloccato la nuova scheda? Clicca qui per aprire WhatsApp &rarr;
+                      </a>
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={closeConfirmation}
+                    style={{
+                      backgroundColor: 'rgb(223, 254, 2)',
+                      color: 'black',
+                      border: 'none',
+                      padding: '12px 36px',
+                      borderRadius: '99px',
+                      fontSize: '13px',
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.08em',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    OK
+                  </button>
+                </div>
+              ) : (
+                /* MODULO DI ISCRIZIONE */
+                <form onSubmit={handleIscrizione}>
+                  <div style={{ color: 'rgb(223, 254, 2)', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '6px' }}>
+                    {selectedEvento.titolo}
+                  </div>
+                  <h3 style={{ margin: '0 0 8px 0', fontSize: '1.3rem', fontWeight: 800, color: 'white' }}>
+                    {modalBar.isWaitlist ? 'Richiedi ingresso in lista d\'attesa' : 'Iscriviti all\'evento'}
+                  </h3>
+                  <p style={{ margin: '0 0 20px 0', fontSize: '0.88rem', color: '#aaa', lineHeight: 1.5 }}>
+                    {modalBar.isWaitlist
+                      ? 'Numero massimo raggiunto: invia i tuoi dati e richiedi l\'accesso al gruppo WhatsApp, resterai in attesa di approvazione se si liberano posti.'
+                      : 'Inserisci i tuoi dati per richiedere l\'ingresso nel gruppo WhatsApp operativo dell\'evento.'}
+                  </p>
+
+                  <div className="form-two-cols">
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#aaa', marginBottom: '6px', fontWeight: 700 }}>
+                        Nome *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        className="ripido-input"
+                        placeholder="Es. Marco"
+                        value={nome}
+                        onChange={e => setNome(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#aaa', marginBottom: '6px', fontWeight: 700 }}>
+                        Cognome *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        className="ripido-input"
+                        placeholder="Es. Rossi"
+                        value={cognome}
+                        onChange={e => setCognome(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom: '12px' }}>
+                    <label style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#aaa', marginBottom: '6px', fontWeight: 700 }}>
+                      Numero di Telefono *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      className="ripido-input"
+                      placeholder="+39 340 1234567"
+                      value={telefono}
+                      onChange={e => setTelefono(e.target.value)}
+                    />
+                  </div>
+
+                  <p style={{ fontSize: '11px', color: '#777', lineHeight: 1.5, margin: '0 0 18px 0' }}>
+                    Usiamo il numero esclusivamente per associare la tua richiesta su WhatsApp (anche in caso di nickname) e coordinare l&apos;uscita, nel rispetto della <Link href="/privacy" style={{ color: '#aaa', textDecoration: 'underline' }}>Privacy Policy</Link>.
+                  </p>
+
+                  {formError && (
+                    <div style={{
+                      backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                      border: '1px solid rgba(239, 68, 68, 0.4)',
+                      color: '#ff6b6b',
+                      padding: '10px 14px',
+                      borderRadius: '10px',
+                      fontSize: '0.85rem',
+                      marginBottom: '16px',
+                      fontWeight: 600
+                    }}>
+                      {formError}
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      disabled={submitting}
+                      onClick={() => { setShowForm(false); setFormError(null); }}
+                      style={{
+                        backgroundColor: 'transparent',
+                        color: '#ccc',
+                        border: '1px solid rgba(255,255,255,0.25)',
+                        padding: '12px 20px',
+                        borderRadius: '99px',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.06em',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Annulla
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      style={{
+                        backgroundColor: 'rgb(223, 254, 2)',
+                        color: 'black',
+                        border: 'none',
+                        padding: '12px 22px',
+                        borderRadius: '99px',
+                        fontSize: '12px',
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.06em',
+                        cursor: submitting ? 'wait' : 'pointer',
+                        opacity: submitting ? 0.7 : 1
+                      }}
+                    >
+                      {submitting ? 'Invio...' : 'Iscriviti ed entra nel gruppo'}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         );
