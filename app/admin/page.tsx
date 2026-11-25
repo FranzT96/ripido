@@ -219,7 +219,15 @@ export default function AdminDashboard() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingGpx, setUploadingGpx] = useState(false);
 
-  const todayIso = new Date().toISOString().slice(0, 10);
+  const [todayIso, setTodayIso] = useState('');
+
+  useEffect(() => {
+    const oggi = new Date();
+    const anno = oggi.getFullYear();
+    const mese = String(oggi.getMonth() + 1).padStart(2, '0');
+    const giorno = String(oggi.getDate()).padStart(2, '0');
+    setTodayIso(`${anno}-${mese}-${giorno}`);
+  }, []);
 
   function notify(type: 'ok' | 'err', text: string) {
     setFeedback({ type, text });
