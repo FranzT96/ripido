@@ -53,7 +53,7 @@ interface IscrizioneDB {
 }
 
 const REGIONI_ITALIA = [
-  'Veneto', 'Trentino', 'FVG', 'Lombardia', 'Piemonte', 'Valle d\'Aosta',
+  'Veneto', 'Trentino', 'FVG', 'Lombardia', 'Piemonte', "Valle d'Aosta",
   'Emilia-Romagna', 'Liguria', 'Toscana', 'Marche', 'Umbria', 'Lazio',
   'Abruzzo', 'Molise', 'Campania', 'Puglia', 'Basilicata', 'Calabria',
   'Sicilia', 'Sardegna'
@@ -94,7 +94,6 @@ const EMPTY_EVENTO = {
   descrizione: ''
 };
 
-// Formatta YYYY-MM-DD in es. "Sabato 5 Dicembre"
 function formatIsoToItalian(iso: string): string {
   if (!iso) return '';
   const parts = iso.split('-').map(Number);
@@ -111,7 +110,131 @@ function formatIsoToItalian(iso: string): string {
     .join(' ');
 }
 
-// Prepara link wa.me pulito per contattare al volo un iscritto
+function isoToSlashDate(iso: string): string {
+  if (!iso) return '';
+  const parts = iso.split('-');
+  if (parts.length !== 3) return iso;
+  const [y, m, d] = parts;
+  return `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;
+}
+
+function parseSlashDateToIso(raw: string): string | null {
+  const clean = raw.trim();
+  const match =
+    clean.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2}|\d{4})$/) ||
+    clean.match(/^(\d{2})(\d{2})(\d{2}|\d{4})$/);
+  if (!match) return null;
+
+  const day = parseInt(match[1], 10);
+  const month = parseInt(match[2], 10);
+  let year = parseInt(match[3], 10);
+
+  if (match[3].length === 2) year += 2000;
+  if (year < 2000 || year > 2100) return null;
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+
+  const check = new Date(year, month - 1, day);
+  if (check.getFullYear() !== year || check.getMonth() !== month - 1 || check.getDate() !== day) {
+    return null;
+  }
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+function DateInputWithPicker({
+  value,
+  onChange,
+  placeholder = 'Es. 12/12/26'
+}: {
+  value: string;
+  onChange: (iso: string) => void;
+  placeholder?: string;
+}) {
+  const [text, setText] = useState(() => isoToSlashDate(value));
+
+  function handleTextChange(raw: string) {
+    setText(raw);
+    const parsed = parseSlashDateToIso(raw);
+    onChange(parsed || '');
+  }
+
+  function handleBlur() {
+    const parsed = parseSlashDateToIso(text);
+    if (parsed) setText(isoToSlashDate(parsed));
+  }
+
+  const pickerValue = value && !value.startsWith('00') ? value : '';
+
+  return (
+    <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+      <input
+        type="text"
+        inputMode="numeric"
+        required
+        className="adm-input"
+        style={{ paddingRight: '46px' }}
+        placeholder={placeholder}
+        value={text}
+        onChange={e => handleTextChange(e.target.value)}
+        onBlur={handleBlur}
+      />
+      <div
+        title="Scegli dal calendario"
+        style={{
+          position: 'absolute',
+          right: '6px',
+          width: '32px',
+          height: '32px',
+          borderRadius: '8px',
+          backgroundColor: 'rgba(223, 254, 2, 0.14)',
+          border: '1px solid rgba(223, 254, 2, 0.4)',
+          color: 'rgb(223, 254, 2)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          cursor: 'pointer'
+        }}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ pointerEvents: 'none' }}>
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+        <input
+          type="date"
+          tabIndex={-1}
+          aria-label="Apri calendario"
+          value={pickerValue}
+          onClick={e => {
+            try {
+              (e.currentTarget as HTMLInputElement).showPicker?.();
+            } catch {
+              // Fallback browser mobile
+            }
+          }}
+          onChange={e => {
+            const iso = e.target.value;
+            if (iso) {
+              setText(isoToSlashDate(iso));
+              onChange(iso);
+            }
+          }}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            opacity: 0,
+            cursor: 'pointer',
+            colorScheme: 'dark'
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 function buildWaMeUrl(phone: string): string {
   let digits = phone.replace(/[^0-9+]/g, '');
   if (digits.startsWith('+')) digits = digits.slice(1);
@@ -120,7 +243,6 @@ function buildWaMeUrl(phone: string): string {
   return `https://wa.me/${digits}`;
 }
 
-// Ridimensiona (max 1400px) e comprime la foto prima dell'upload su Supabase Storage
 async function compressImageFile(file: File, maxDim = 1400, quality = 0.84): Promise<{ blob: Blob; ext: string; contentType: string }> {
   return new Promise((resolve) => {
     const img = new Image();
@@ -185,17 +307,14 @@ export default function AdminDashboard() {
   const [session, setSession] = useState<Session | null>(null);
   const [authChecking, setAuthChecking] = useState(true);
 
-  // Login states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  // Navigazione e feedback
   const [activeSection, setActiveSection] = useState<'eventi' | 'iscritti' | 'uscite'>('eventi');
   const [feedback, setFeedback] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
 
-  // Dati DB
   const [eventi, setEventi] = useState<EventoDB[]>([]);
   const [uscite, setUscite] = useState<UscitaDB[]>([]);
   const [selectedEventoIdForIscritti, setSelectedEventoIdForIscritti] = useState<number | null>(null);
@@ -203,23 +322,27 @@ export default function AdminDashboard() {
   const [loadingIscritti, setLoadingIscritti] = useState(false);
   const [searchIscritto, setSearchIscritto] = useState('');
 
-  // Form Evento
   const [showEventoForm, setShowEventoForm] = useState(false);
   const [editingEventoId, setEditingEventoId] = useState<number | null>(null);
   const [eventoForm, setEventoForm] = useState(EMPTY_EVENTO);
   const [savingEvento, setSavingEvento] = useState(false);
 
-  // Form Uscita
   const [showUscitaForm, setShowUscitaForm] = useState(false);
   const [editingUscitaId, setEditingUscitaId] = useState<number | null>(null);
   const [uscitaForm, setUscitaForm] = useState(EMPTY_USCITA);
   const [savingUscita, setSavingUscita] = useState(false);
 
-  // Upload states
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingGpx, setUploadingGpx] = useState(false);
-
   const [todayIso, setTodayIso] = useState('');
+
+  const [confirmDialog, setConfirmDialog] = useState<{
+    title: string;
+    message: string;
+    confirmLabel: string;
+    onConfirm: () => Promise<void>;
+  } | null>(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   useEffect(() => {
     const oggi = new Date();
@@ -228,6 +351,23 @@ export default function AdminDashboard() {
     const giorno = String(oggi.getDate()).padStart(2, '0');
     setTodayIso(`${anno}-${mese}-${giorno}`);
   }, []);
+
+  useEffect(() => {
+    if (!confirmDialog) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !confirmLoading) setConfirmDialog(null);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [confirmDialog, confirmLoading]);
+
+  async function executeConfirmDialog() {
+    if (!confirmDialog || confirmLoading) return;
+    setConfirmLoading(true);
+    await confirmDialog.onConfirm();
+    setConfirmLoading(false);
+    setConfirmDialog(null);
+  }
 
   function notify(type: 'ok' | 'err', text: string) {
     setFeedback({ type, text });
@@ -280,9 +420,7 @@ export default function AdminDashboard() {
   }, []);
 
   useEffect(() => {
-    if (session) {
-      loadAllData();
-    }
+    if (session) loadAllData();
   }, [session, loadAllData]);
 
   useEffect(() => {
@@ -291,7 +429,6 @@ export default function AdminDashboard() {
     }
   }, [session, selectedEventoIdForIscritti, loadIscritti]);
 
-  // --- AUTENTICAZIONE ---
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoginLoading(true);
@@ -314,7 +451,6 @@ export default function AdminDashboard() {
     await supabase.auth.signOut();
   }
 
-  // --- UPLOAD MEDIA SU SUPABASE STORAGE ---
   async function handleImageUpload(file: File, target: 'evento' | 'uscita') {
     setUploadingImage(true);
     try {
@@ -340,7 +476,7 @@ export default function AdminDashboard() {
       }
       notify('ok', 'Foto ottimizzata e caricata!');
     } catch {
-      notify('err', 'Impossibile elaborare l\'immagine selezionata.');
+      notify('err', "Impossibile elaborare l'immagine selezionata.");
     }
     setUploadingImage(false);
   }
@@ -364,7 +500,6 @@ export default function AdminDashboard() {
     setUploadingGpx(false);
   }
 
-  // --- AZIONI EVENTI SPECIALI ---
   function openNewEvento() {
     setEditingEventoId(null);
     setEventoForm(EMPTY_EVENTO);
@@ -392,8 +527,12 @@ export default function AdminDashboard() {
 
   async function handleSaveEvento(e: React.FormEvent) {
     e.preventDefault();
+    if (!eventoForm.data_fine) {
+      notify('err', 'Inserisci una data fine valida (es. 12/12/26 o dal calendario).');
+      return;
+    }
     if (!eventoForm.immagine_url.trim()) {
-      notify('err', 'Carica una foto o inserisci un URL immagine per l\'evento.');
+      notify('err', "Carica una foto o inserisci un URL immagine per l'evento.");
       return;
     }
     setSavingEvento(true);
@@ -442,18 +581,23 @@ export default function AdminDashboard() {
     notify('ok', `Stato aggiornato a: ${nuovoStato.replace('_', ' ').toUpperCase()}`);
   }
 
-  async function handleDeleteEvento(ev: EventoDB) {
-    if (!window.confirm(`Eliminare definitivamente "${ev.titolo}" e tutta la lista dei suoi iscritti?`)) return;
-    const { error } = await supabase.from('eventi_speciali').delete().eq('id', ev.id);
-    if (error) {
-      notify('err', `Errore eliminazione: ${error.message}`);
-    } else {
-      notify('ok', 'Evento eliminato.');
-      await loadAllData();
-    }
+  function handleDeleteEvento(ev: EventoDB) {
+    setConfirmDialog({
+      title: 'Elimina Evento',
+      message: `Vuoi eliminare definitivamente "${ev.titolo}" e tutta la lista dei suoi iscritti? L'operazione non è annullabile.`,
+      confirmLabel: 'Elimina evento',
+      onConfirm: async () => {
+        const { error } = await supabase.from('eventi_speciali').delete().eq('id', ev.id);
+        if (error) {
+          notify('err', `Errore eliminazione: ${error.message}`);
+        } else {
+          notify('ok', 'Evento eliminato.');
+          await loadAllData();
+        }
+      }
+    });
   }
 
-  // --- AZIONI ISCRITTI ---
   async function handleStatoIscritto(iscrittoId: number, nuovoStato: 'inviato' | 'confermato' | 'ritirato') {
     const { error } = await supabase
       .from('iscrizioni_eventi')
@@ -469,17 +613,24 @@ export default function AdminDashboard() {
     await loadAllData();
   }
 
-  async function handleDeleteIscritto(iscritto: IscrizioneDB) {
-    if (!window.confirm(`Rimuovere definitivamente ${iscritto.nome} ${iscritto.cognome} dalla lista?`)) return;
-    const { error } = await supabase.from('iscrizioni_eventi').delete().eq('id', iscritto.id);
-    if (!error) {
-      setIscritti(prev => prev.filter(i => i.id !== iscritto.id));
-      await loadAllData();
-      notify('ok', 'Iscritto rimosso.');
-    }
+  function handleDeleteIscritto(iscritto: IscrizioneDB) {
+    setConfirmDialog({
+      title: 'Rimuovi Iscritto',
+      message: `Vuoi rimuovere definitivamente ${iscritto.nome} ${iscritto.cognome} dalla lista degli iscritti?`,
+      confirmLabel: 'Rimuovi',
+      onConfirm: async () => {
+        const { error } = await supabase.from('iscrizioni_eventi').delete().eq('id', iscritto.id);
+        if (error) {
+          notify('err', `Errore rimozione: ${error.message}`);
+        } else {
+          setIscritti(prev => prev.filter(i => i.id !== iscritto.id));
+          await loadAllData();
+          notify('ok', 'Iscritto rimosso.');
+        }
+      }
+    });
   }
 
-  // --- AZIONI USCITE ---
   function openNewUscita() {
     setEditingUscitaId(null);
     setUscitaForm(EMPTY_USCITA);
@@ -512,8 +663,12 @@ export default function AdminDashboard() {
 
   async function handleSaveUscita(e: React.FormEvent) {
     e.preventDefault();
+    if (!uscitaForm.iso_date) {
+      notify('err', 'Inserisci una data valida (es. 12/12/26 o dal calendario).');
+      return;
+    }
     if (!uscitaForm.immagine_url.trim()) {
-      notify('err', 'Carica una foto o inserisci un URL immagine per l\'uscita.');
+      notify('err', "Carica una foto o inserisci un URL immagine per l'uscita.");
       return;
     }
     setSavingUscita(true);
@@ -553,13 +708,21 @@ export default function AdminDashboard() {
     await loadAllData();
   }
 
-  async function handleDeleteUscita(u: UscitaDB) {
-    if (!window.confirm(`Eliminare definitivamente l'uscita "${u.titolo}"?`)) return;
-    const { error } = await supabase.from('uscite').delete().eq('id', u.id);
-    if (!error) {
-      notify('ok', 'Uscita eliminata.');
-      await loadAllData();
-    }
+  function handleDeleteUscita(u: UscitaDB) {
+    setConfirmDialog({
+      title: 'Elimina Uscita',
+      message: `Vuoi eliminare definitivamente l'uscita "${u.titolo}" dal calendario?`,
+      confirmLabel: 'Elimina uscita',
+      onConfirm: async () => {
+        const { error } = await supabase.from('uscite').delete().eq('id', u.id);
+        if (error) {
+          notify('err', `Errore eliminazione: ${error.message}`);
+        } else {
+          notify('ok', 'Uscita eliminata.');
+          await loadAllData();
+        }
+      }
+    });
   }
 
   const activeEventoForIscritti = eventi.find(e => e.id === selectedEventoIdForIscritti) || null;
@@ -660,7 +823,6 @@ export default function AdminDashboard() {
         }
       `}</style>
 
-      {/* Toast di notifica */}
       {feedback && (
         <div style={{
           position: 'fixed', bottom: '24px', right: '24px', zIndex: 2000,
@@ -677,7 +839,6 @@ export default function AdminDashboard() {
         {authChecking ? (
           <div style={{ padding: '80px 0', textAlign: 'center', color: '#888' }}>Verifica sessione...</div>
         ) : !session ? (
-          /* SCHERMATA LOGIN ADMIN */
           <div style={{ maxWidth: '420px', margin: '60px auto' }}>
             <div style={{ marginBottom: '24px' }}>
               <Link href="/" style={{ color: 'rgb(223, 254, 2)', textDecoration: 'none', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
@@ -729,9 +890,7 @@ export default function AdminDashboard() {
             </div>
           </div>
         ) : (
-          /* PANNELLO OPERATIVO LOGGATO */
           <>
-            {/* Topbar */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px', marginBottom: '26px' }}>
               <div>
                 <Link href="/" style={{ color: 'rgb(223, 254, 2)', textDecoration: 'none', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
@@ -748,29 +907,18 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Navigazione Tab */}
             <div className="adm-tabs">
-              <button
-                className={`adm-tab ${activeSection === 'eventi' ? 'active' : ''}`}
-                onClick={() => setActiveSection('eventi')}
-              >
+              <button className={`adm-tab ${activeSection === 'eventi' ? 'active' : ''}`} onClick={() => setActiveSection('eventi')}>
                 Eventi Speciali ({eventi.length})
               </button>
-              <button
-                className={`adm-tab ${activeSection === 'iscritti' ? 'active' : ''}`}
-                onClick={() => setActiveSection('iscritti')}
-              >
+              <button className={`adm-tab ${activeSection === 'iscritti' ? 'active' : ''}`} onClick={() => setActiveSection('iscritti')}>
                 Iscritti Eventi
               </button>
-              <button
-                className={`adm-tab ${activeSection === 'uscite' ? 'active' : ''}`}
-                onClick={() => setActiveSection('uscite')}
-              >
+              <button className={`adm-tab ${activeSection === 'uscite' ? 'active' : ''}`} onClick={() => setActiveSection('uscite')}>
                 Prossime Uscite ({uscite.length})
               </button>
             </div>
 
-            {/* ==================== SEZIONE 1: EVENTI SPECIALI ==================== */}
             {activeSection === 'eventi' && (
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
@@ -779,7 +927,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {eventi.map(ev => {
-                  const isPast = ev.data_fine < todayIso;
+                  const isPast = todayIso ? ev.data_fine < todayIso : false;
                   return (
                     <div key={ev.id} className="adm-card" style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
                       <div style={{ display: 'flex', gap: '16px', alignItems: 'center', minWidth: '260px', flex: 1 }}>
@@ -802,25 +950,15 @@ export default function AdminDashboard() {
                         </div>
                       </div>
 
-                      {/* Controlli rapidi Stato a 1 Click + Azioni */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-end' }}>
                         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                          <button
-                            className={`state-pill ${ev.stato_iscrizioni === 'aperte' ? 'active-green' : ''}`}
-                            onClick={() => handleQuickStatoEvento(ev.id, 'aperte')}
-                          >
+                          <button className={`state-pill ${ev.stato_iscrizioni === 'aperte' ? 'active-green' : ''}`} onClick={() => handleQuickStatoEvento(ev.id, 'aperte')}>
                             Aperte
                           </button>
-                          <button
-                            className={`state-pill ${ev.stato_iscrizioni === 'sold_out' ? 'active-red' : ''}`}
-                            onClick={() => handleQuickStatoEvento(ev.id, 'sold_out')}
-                          >
+                          <button className={`state-pill ${ev.stato_iscrizioni === 'sold_out' ? 'active-red' : ''}`} onClick={() => handleQuickStatoEvento(ev.id, 'sold_out')}>
                             Sold Out
                           </button>
-                          <button
-                            className={`state-pill ${ev.stato_iscrizioni === 'chiuso' ? 'active-gray' : ''}`}
-                            onClick={() => handleQuickStatoEvento(ev.id, 'chiuso')}
-                          >
+                          <button className={`state-pill ${ev.stato_iscrizioni === 'chiuso' ? 'active-gray' : ''}`} onClick={() => handleQuickStatoEvento(ev.id, 'chiuso')}>
                             Chiuso
                           </button>
                         </div>
@@ -845,7 +983,6 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* ==================== SEZIONE 2: ISCRITTI EVENTI ==================== */}
             {activeSection === 'iscritti' && (
               <div>
                 <div className="adm-grid-2" style={{ alignItems: 'end', marginBottom: '20px' }}>
@@ -949,22 +1086,13 @@ export default function AdminDashboard() {
                         </div>
 
                         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-                          <button
-                            className={`state-pill ${iscritto.stato === 'inviato' ? 'active-yellow' : ''}`}
-                            onClick={() => handleStatoIscritto(iscritto.id, 'inviato')}
-                          >
+                          <button className={`state-pill ${iscritto.stato === 'inviato' ? 'active-yellow' : ''}`} onClick={() => handleStatoIscritto(iscritto.id, 'inviato')}>
                             Inviato
                           </button>
-                          <button
-                            className={`state-pill ${iscritto.stato === 'confermato' ? 'active-green' : ''}`}
-                            onClick={() => handleStatoIscritto(iscritto.id, 'confermato')}
-                          >
+                          <button className={`state-pill ${iscritto.stato === 'confermato' ? 'active-green' : ''}`} onClick={() => handleStatoIscritto(iscritto.id, 'confermato')}>
                             Confermato
                           </button>
-                          <button
-                            className={`state-pill ${iscritto.stato === 'ritirato' ? 'active-red' : ''}`}
-                            onClick={() => handleStatoIscritto(iscritto.id, 'ritirato')}
-                          >
+                          <button className={`state-pill ${iscritto.stato === 'ritirato' ? 'active-red' : ''}`} onClick={() => handleStatoIscritto(iscritto.id, 'ritirato')}>
                             Ritirato
                           </button>
                           <button
@@ -983,7 +1111,6 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* ==================== SEZIONE 3: PROSSIME USCITE ==================== */}
             {activeSection === 'uscite' && (
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
@@ -992,7 +1119,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {uscite.map(u => {
-                  const isPast = u.iso_date < todayIso;
+                  const isPast = todayIso ? u.iso_date < todayIso : false;
                   return (
                     <div key={u.id} className="adm-card" style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
                       <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flex: 1, minWidth: '250px' }}>
@@ -1028,7 +1155,7 @@ export default function AdminDashboard() {
         )}
       </div>
 
-      {/* ==================== MODALE FORM EVENTO SPECIALE ==================== */}
+      {/* MODALE FORM EVENTO SPECIALE */}
       {showEventoForm && (
         <div
           style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', zIndex: 1200, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}
@@ -1061,7 +1188,11 @@ export default function AdminDashboard() {
                 </div>
                 <div>
                   <label className="adm-label">Data fine evento (archivio auto) *</label>
-                  <input type="date" required className="adm-input" value={eventoForm.data_fine} onChange={e => setEventoForm({ ...eventoForm, data_fine: e.target.value })} />
+                  <DateInputWithPicker
+                    key={`ev-date-${editingEventoId ?? 'new'}`}
+                    value={eventoForm.data_fine}
+                    onChange={iso => setEventoForm(prev => ({ ...prev, data_fine: iso }))}
+                  />
                 </div>
                 <div>
                   <label className="adm-label">Quota spese *</label>
@@ -1099,7 +1230,6 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Upload Foto + Anteprima 4:5 */}
               <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '16px', marginBottom: '14px', display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
                 {eventoForm.immagine_url && (
                   <img src={eventoForm.immagine_url} alt="Anteprima" style={{ width: '80px', height: '100px', objectFit: 'cover', borderRadius: '10px', border: '1px solid rgba(223,254,2,0.4)' }} />
@@ -1142,7 +1272,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* ==================== MODALE FORM USCITA ==================== */}
+      {/* MODALE FORM USCITA */}
       {showUscitaForm && (
         <div
           style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', zIndex: 1200, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}
@@ -1175,17 +1305,14 @@ export default function AdminDashboard() {
               <div className="adm-grid-3">
                 <div>
                   <label className="adm-label">Data Calendario *</label>
-                  <input
-                    type="date"
-                    required
-                    className="adm-input"
+                  <DateInputWithPicker
+                    key={`us-date-${editingUscitaId ?? 'new'}`}
                     value={uscitaForm.iso_date}
-                    onChange={e => {
-                      const iso = e.target.value;
+                    onChange={iso => {
                       setUscitaForm(prev => ({
                         ...prev,
                         iso_date: iso,
-                        data_testo: formatIsoToItalian(iso)
+                        data_testo: iso ? formatIsoToItalian(iso) : prev.data_testo
                       }));
                     }}
                   />
@@ -1270,7 +1397,6 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Upload Foto + Anteprima 4:5 */}
               <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '16px', marginBottom: '20px', display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
                 {uscitaForm.immagine_url && (
                   <img src={uscitaForm.immagine_url} alt="Anteprima" style={{ width: '80px', height: '100px', objectFit: 'cover', borderRadius: '10px', border: '1px solid rgba(223,254,2,0.4)' }} />
@@ -1307,6 +1433,78 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      {/* MODALE CONFERMA ELIMINAZIONE */}
+      {confirmDialog && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.82)',
+            backdropFilter: 'blur(8px)', zIndex: 2100, display: 'flex',
+            justifyContent: 'center', alignItems: 'center', padding: '20px'
+          }}
+          onClick={() => !confirmLoading && setConfirmDialog(null)}
+        >
+          <div
+            style={{
+              backgroundColor: '#141414', width: '100%', maxWidth: '430px',
+              borderRadius: '22px', padding: '28px',
+              border: '1px solid rgba(239, 68, 68, 0.35)',
+              boxShadow: '0 30px 70px rgba(0, 0, 0, 0.9)', textAlign: 'center'
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{
+              width: '48px', height: '48px', borderRadius: '50%',
+              backgroundColor: 'rgba(239, 68, 68, 0.14)',
+              border: '1px solid rgba(239, 68, 68, 0.45)',
+              color: '#ff6b6b', display: 'flex', alignItems: 'center',
+              justifyContent: 'center', margin: '0 auto 16px'
+            }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                <path d="M10 11v6" />
+                <path d="M14 11v6" />
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+              </svg>
+            </div>
+
+            <h3 style={{ margin: '0 0 10px 0', fontSize: '1.3rem', fontWeight: 800, color: 'white' }}>
+              {confirmDialog.title}
+            </h3>
+
+            <p style={{ color: '#bbb', fontSize: '0.92rem', lineHeight: 1.6, margin: '0 0 24px 0' }}>
+              {confirmDialog.message}
+            </p>
+
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                disabled={confirmLoading}
+                className="adm-btn-ghost"
+                style={{ padding: '11px 22px', fontSize: '12px' }}
+                onClick={() => setConfirmDialog(null)}
+              >
+                Annulla
+              </button>
+              <button
+                type="button"
+                disabled={confirmLoading}
+                onClick={executeConfirmDialog}
+                style={{
+                  backgroundColor: '#ef4444', color: 'white', border: 'none',
+                  padding: '11px 24px', borderRadius: '99px', fontSize: '12px',
+                  fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em',
+                  cursor: confirmLoading ? 'wait' : 'pointer', opacity: confirmLoading ? 0.7 : 1
+                }}
+              >
+                {confirmLoading ? 'Eliminazione...' : confirmDialog.confirmLabel}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
+// FINE FILE
