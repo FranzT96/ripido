@@ -6,6 +6,24 @@ export default function RipidoHome() {
       {/* Nota: height 100dvh previene problemi con la barra di navigazione mobile */}
       
       <style>{`
+        .ripido-btn {
+          transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+        }
+        .ripido-btn:hover {
+          border-color: rgb(223, 254, 2) !important;
+          color: rgb(223, 254, 2) !important;
+          background-color: rgba(0, 0, 0, 0.55) !important;
+          transform: translateY(-2px);
+        }
+        .cta-bottom {
+          transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .cta-bottom:hover {
+          background-color: rgb(223, 254, 2) !important;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(223, 254, 2, 0.3) !important;
+        }
+
         @media (min-width: 769px) and (max-width: 1100px) {
           .ripido-logo-box {
             width: 170px !important;

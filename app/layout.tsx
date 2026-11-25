@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Montserrat, Playfair_Display } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import "./globals.css";
 
-// Font Sans-serif pulito per i testi piccoli e i menu
+// Font Sans-serif pulito per tutto il sito
 const montserrat = Montserrat({ subsets: ["latin"], variable: '--font-montserrat' });
-// Font Serif elegante per i titoli grandi stile Pampero
-const playfair = Playfair_Display({ subsets: ["latin"], style: ['normal', 'italic'], variable: '--font-playfair' });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ripido.vercel.app"),
@@ -37,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="it" className="m-0 p-0 w-full h-full scroll-smooth">
-      <body className={`${montserrat.className} ${montserrat.variable} ${playfair.variable} bg-[#0a0a0a] text-white m-0 p-0 w-full h-full overflow-x-hidden antialiased`}>
+      <body className={`${montserrat.className} ${montserrat.variable} bg-[#0a0a0a] text-white m-0 p-0 w-full h-full overflow-x-hidden antialiased`}>
         
         {/* IL CONTENUTO DELLE PAGINE */}
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

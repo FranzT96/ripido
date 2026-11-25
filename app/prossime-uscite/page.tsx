@@ -44,6 +44,26 @@ export default function ProssimeUscite() {
   const [activeRegion, setActiveRegion] = useState('Tutte');
   const [selectedUscita, setSelectedUscita] = useState<typeof usciteData[0] | null>(null);
 
+  useEffect(() => {
+    if (!selectedUscita) return;
+
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedUscita(null);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = prevBodyOverflow;
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedUscita]);
+
   const filteredByTab = todayIso
     ? usciteData
         .filter(u => (activeTab === 'programma' ? !u.past : u.past))

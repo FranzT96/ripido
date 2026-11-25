@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function EventiSpeciali() {
   // Dati di esempio basati sul tuo messaggio di Halloween
@@ -39,6 +39,26 @@ Costo indicativo: circa 50 € a persona, comprensivi di cena, pernottamento e c
   ];
 
   const [selectedEvento, setSelectedEvento] = useState<typeof eventiData[0] | null>(null);
+
+  useEffect(() => {
+    if (!selectedEvento) return;
+
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedEvento(null);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = prevBodyOverflow;
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedEvento]);
 
   return (
     <main style={{ position: 'relative', width: '100%', minHeight: '100dvh', color: 'white', padding: '40px 20px', overflow: 'hidden' }}>
@@ -130,9 +150,14 @@ Costo indicativo: circa 50 € a persona, comprensivi di cena, pernottamento e c
             const esaurito = postiDisponibili <= 0;
 
             return (
-              <div key={evento.id} className="evento-card">
+              <div key={evento.id} className="evento-card" style={{ opacity: evento.chiuso ? 0.75 : 1 }}>
                 <div className="evento-img-container">
-                  <img src={evento.immagine} alt={evento.titolo} className="evento-img" />
+                  <img src={evento.immagine} alt={evento.titolo} className="evento-img" style={{ filter: evento.chiuso ? 'grayscale(40%)' : 'none' }} />
+                  {evento.chiuso && (
+                    <div style={{ position: 'absolute', top: '15px', left: '15px', backgroundColor: 'rgba(15,15,15,0.85)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(5px)', padding: '6px 12px', borderRadius: '99px', fontSize: '11px', fontWeight: 'bold', color: '#ccc', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                      Concluso
+                    </div>
+                  )}
                   <div style={{ position: 'absolute', top: '15px', right: '15px', backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(5px)', padding: '6px 12px', borderRadius: '99px', fontSize: '12px', fontWeight: 'bold', color: 'white', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                     {evento.data}
                   </div>
@@ -238,7 +263,7 @@ Costo indicativo: circa 50 € a persona, comprensivi di cena, pernottamento e c
                   </button>
                 ) : (
                   <button disabled style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#666', border: 'none', padding: '14px 28px', borderRadius: '99px', fontSize: '14px', fontWeight: 'bold', textTransform: 'uppercase', cursor: 'not-allowed' }}>
-                    Posti Esauriti
+                    {selectedEvento.chiuso ? 'Evento Concluso' : 'Posti Esauriti'}
                   </button>
                 )}
               </div>
