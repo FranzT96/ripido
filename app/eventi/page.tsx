@@ -59,6 +59,26 @@ export default function EventiSpeciali() {
     }
 
     fetchEventi();
+
+    // Aggiorna la barra in tempo reale per tutti gli utenti collegati
+    const channel = supabase
+      .channel('eventi-speciali-live')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'eventi_speciali' },
+        (payload) => {
+          const updated = payload.new as EventoDB;
+          setEventiRaw(prev => prev.map(ev => (ev.id === updated.id ? updated : ev)));
+          setSelectedEvento(prev =>
+            prev && prev.id === updated.id ? { ...prev, ...updated } : prev
+          );
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const eventiData: EventoView[] = eventiRaw.map(evento => ({
@@ -95,14 +115,13 @@ export default function EventiSpeciali() {
     };
   }, [selectedEvento?.id]);
 
-  // Helper per calcolare colore ed etichetta della barra a 20 trattini
+  // Helper per calcolare avanzamento (a step di 1/capienza), colore ed etichetta della barra unica
   function getBarMeta(evento: EventoView) {
-    const totalTicks = Math.max(1, evento.capienza_gruppo || 20);
+    const capienza = Math.max(1, evento.capienza_gruppo || 20);
 
     if (evento.stato_iscrizioni === 'sold_out') {
       return {
-        totalTicks,
-        filledTicks: totalTicks,
+        percentage: 100,
         color: '#ef4444',
         statusLabel: 'Sold Out',
         isWaitlist: false
@@ -110,18 +129,19 @@ export default function EventiSpeciali() {
     }
 
     if (evento.stato_iscrizioni === 'chiuso') {
+      const ratioChiuso = Math.min(1, Math.max(0, evento.iscritti_attivi) / capienza);
       return {
-        totalTicks,
-        filledTicks: Math.min(totalTicks, evento.iscritti_attivi),
+        percentage: Math.round(ratioChiuso * 100),
         color: '#666666',
         statusLabel: 'Iscrizioni chiuse',
         isWaitlist: false
       };
     }
 
-    const filledTicks = Math.min(totalTicks, Math.max(0, evento.iscritti_attivi));
-    const ratio = filledTicks / totalTicks;
-    const isWaitlist = evento.iscritti_attivi >= totalTicks;
+    const occupati = Math.min(capienza, Math.max(0, evento.iscritti_attivi));
+    const ratio = occupati / capienza;
+    const percentage = Math.round(ratio * 100);
+    const isWaitlist = evento.iscritti_attivi >= capienza;
 
     let color = '#22c55e'; // Verde (<= 50%)
     if (ratio > 0.85) {
@@ -139,7 +159,7 @@ export default function EventiSpeciali() {
       statusLabel = 'Buona disponibilità';
     }
 
-    return { totalTicks, filledTicks, color, statusLabel, isWaitlist };
+    return { percentage, color, statusLabel, isWaitlist };
   }
 
   async function handleIscrizione(e: React.FormEvent) {
@@ -310,18 +330,18 @@ export default function EventiSpeciali() {
           color: black;
           transform: translate(2px, -2px);
         }
-        /* Barra segmentata a 20 trattini */
-        .ticks-row {
-          display: flex;
-          gap: 3px;
+        /* Barra unica continua con transizione morbida */
+        .status-bar-track {
           width: 100%;
-          align-items: center;
-        }
-        .tick-dash {
-          flex: 1;
           height: 6px;
-          border-radius: 2px;
-          transition: background-color 0.3s ease;
+          background-color: rgba(255, 255, 255, 0.14);
+          border-radius: 99px;
+          overflow: hidden;
+        }
+        .status-bar-fill {
+          height: 100%;
+          border-radius: 99px;
+          transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.4s ease;
         }
         .stats-strip-3 {
           display: grid;
@@ -406,12 +426,6 @@ export default function EventiSpeciali() {
             >
               Eventi Passati {!loading && todayIso ? `(${countStorico})` : ''}
             </button>
-          </div>
-
-          <div style={{ fontSize: '12px', color: '#888' }}>
-            {activeTab === 'programma'
-              ? 'Adesione tramite gruppo dedicato a rimborso spese vive'
-              : 'Archivio dei weekend e delle serate vissute insieme'}
           </div>
         </div>
 
@@ -565,23 +579,21 @@ export default function EventiSpeciali() {
                         {evento.titolo}
                       </h2>
 
-                      {/* Barra Semaforo a 20 Trattini (senza numeri esposti) */}
+                      {/* Barra Semaforo Unica Continua */}
                       {!evento.past && (
                         <div style={{ marginTop: '16px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#bbb', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.08em', marginBottom: '7px' }}>
                             <span>Stato adesioni</span>
                             <span style={{ color: bar.color }}>{bar.statusLabel}</span>
                           </div>
-                          <div className="ticks-row">
-                            {Array.from({ length: bar.totalTicks }).map((_, idx) => (
-                              <span
-                                key={idx}
-                                className="tick-dash"
-                                style={{
-                                  backgroundColor: idx < bar.filledTicks ? bar.color : 'rgba(255, 255, 255, 0.14)'
-                                }}
-                              />
-                            ))}
+                          <div className="status-bar-track">
+                            <div
+                              className="status-bar-fill"
+                              style={{
+                                width: `${bar.percentage}%`,
+                                backgroundColor: bar.color
+                              }}
+                            />
                           </div>
                         </div>
                       )}
@@ -690,20 +702,17 @@ export default function EventiSpeciali() {
                   </div>
                 </div>
 
-                {/* Barra 20 trattini nella modale */}
+                {/* Barra continua nella modale */}
                 {!selectedEvento.past && (
                   <div style={{ marginBottom: '22px' }}>
-                    <div className="ticks-row">
-                      {Array.from({ length: modalBar.totalTicks }).map((_, idx) => (
-                        <span
-                          key={idx}
-                          className="tick-dash"
-                          style={{
-                            height: '7px',
-                            backgroundColor: idx < modalBar.filledTicks ? modalBar.color : 'rgba(255, 255, 255, 0.12)'
-                          }}
-                        />
-                      ))}
+                    <div className="status-bar-track" style={{ height: '7px', backgroundColor: 'rgba(255, 255, 255, 0.12)' }}>
+                      <div
+                        className="status-bar-fill"
+                        style={{
+                          width: `${modalBar.percentage}%`,
+                          backgroundColor: modalBar.color
+                        }}
+                      />
                     </div>
                   </div>
                 )}
