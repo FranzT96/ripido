@@ -1,4 +1,3 @@
-'use client';
 import Link from 'next/link';
 
 export default function ChiSiamo() {
@@ -27,7 +26,7 @@ export default function ChiSiamo() {
   ];
 
   return (
-    <main style={{ position: 'relative', width: '100%', minHeight: '100dvh', color: 'white', padding: '40px 20px', fontFamily: 'sans-serif', overflow: 'hidden' }}>
+    <main style={{ position: 'relative', width: '100%', minHeight: '100dvh', color: 'white', padding: '40px 20px', overflow: 'hidden' }}>
       
       {/* BACKGROUND CHI SIAMO (Cresta e persone) */}
       <div style={{

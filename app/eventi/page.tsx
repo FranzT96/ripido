@@ -41,7 +41,7 @@ Costo indicativo: circa 50 € a persona, comprensivi di cena, pernottamento e c
   const [selectedEvento, setSelectedEvento] = useState<typeof eventiData[0] | null>(null);
 
   return (
-    <main style={{ position: 'relative', width: '100%', minHeight: '100dvh', color: 'white', padding: '40px 20px', fontFamily: 'sans-serif', overflow: 'hidden' }}>
+    <main style={{ position: 'relative', width: '100%', minHeight: '100dvh', color: 'white', padding: '40px 20px', overflow: 'hidden' }}>
       
       {/* BACKGROUND VERE LINEE TOPOGRAFICHE (File Locale) */}
       <div style={{

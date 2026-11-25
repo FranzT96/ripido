@@ -14,7 +14,7 @@ export default function ProssimeUscite() {
     { 
       id: 2, data: 'Domenica 15 Novembre', isoDate: '2026-11-15', titolo: 'Lago di Sorapis via sentiero 215', regione: 'Veneto', 
       dPlus: '400m', km: '10km', livello: 'E', guide: 'Giada', 
-      immagine: 'https://images.unsplash.com/photo-1522616238699-a9314455acdb?q=80&w=300&auto=format&fit=crop',
+      immagine: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=300&auto=format&fit=crop',
       maxPartecipanti: null, pernottamento: 'No', puntoPartenza: 'Passo Tre Croci', puntoArrivo: 'Passo Tre Croci', tipologia: 'Andata e ritorno', tempoStimato: '4.5 h'
     },
     { id: 3, data: 'Sabato 21 Novembre', isoDate: '2026-11-21', titolo: 'Rifugio Tuckett e Casinei', regione: 'Trentino', dPlus: '800m', km: '14km', livello: 'E', guide: 'Matteo', immagine: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?q=80&w=300&auto=format&fit=crop' },
@@ -24,28 +24,35 @@ export default function ProssimeUscite() {
     { id: 7, data: 'Venerdì 30 Ottobre', isoDate: '2026-10-30', titolo: 'Laghi di Fusine e Rifugio Zacchi', regione: 'FVG', dPlus: '500m', km: '10km', livello: 'E', guide: 'Giada', immagine: 'https://images.unsplash.com/photo-1542224566-6e85f2e10696?q=80&w=300&auto=format&fit=crop' }
   ];
 
-  // Inizializza i dati in uno stato locale (di default past: false per non bloccare la build di Vercel)
-  const [usciteData, setUsciteData] = useState(usciteDataRaw.map(u => ({ ...u, past: false })));
+  const [todayIso, setTodayIso] = useState<string | null>(null);
 
-  // Calcola la data reale SOLO lato client (browser), evitando l'errore in fase di build
+  // Calcola la data locale (YYYY-MM-DD) solo lato client, evitando sia il blocco di prerender sia lo scarto UTC
   useEffect(() => {
     const oggi = new Date();
-    oggi.setHours(0, 0, 0, 0);
-
-    setUsciteData(usciteDataRaw.map(uscita => {
-      const dataUscita = new Date(uscita.isoDate);
-      return {
-        ...uscita,
-        past: dataUscita < oggi
-      };
-    }));
+    const anno = oggi.getFullYear();
+    const mese = String(oggi.getMonth() + 1).padStart(2, '0');
+    const giorno = String(oggi.getDate()).padStart(2, '0');
+    setTodayIso(`${anno}-${mese}-${giorno}`);
   }, []);
+
+  const usciteData = usciteDataRaw.map(uscita => ({
+    ...uscita,
+    past: todayIso ? uscita.isoDate < todayIso : false
+  }));
 
   const [activeTab, setActiveTab] = useState('programma'); 
   const [activeRegion, setActiveRegion] = useState('Tutte');
   const [selectedUscita, setSelectedUscita] = useState<typeof usciteData[0] | null>(null);
 
-  const filteredByTab = usciteData.filter(u => activeTab === 'programma' ? !u.past : u.past);
+  const filteredByTab = todayIso
+    ? usciteData
+        .filter(u => (activeTab === 'programma' ? !u.past : u.past))
+        .sort((a, b) =>
+          activeTab === 'programma'
+            ? a.isoDate.localeCompare(b.isoDate)
+            : b.isoDate.localeCompare(a.isoDate)
+        )
+    : [];
   const regioniDisponibili = ['Tutte', ...Array.from(new Set(filteredByTab.map(u => u.regione)))];
   const usciteVisualizzate = filteredByTab.filter(u => activeRegion === 'Tutte' || u.regione === activeRegion);
 
@@ -56,7 +63,7 @@ export default function ProssimeUscite() {
   }, {} as Record<string, typeof usciteData>);
 
   return (
-    <main style={{ position: 'relative', width: '100%', minHeight: '100dvh', color: 'white', padding: '40px 20px', fontFamily: 'sans-serif', overflow: 'hidden' }}>
+    <main style={{ position: 'relative', width: '100%', minHeight: '100dvh', color: 'white', padding: '40px 20px', overflow: 'hidden' }}>
       
       {/* BACKGROUND VERE LINEE TOPOGRAFICHE (File Locale) */}
       <div style={{
@@ -176,7 +183,9 @@ export default function ProssimeUscite() {
         </div>
 
         {/* Lista Uscite */}
-        {Object.keys(usciteRaggruppate).length === 0 ? (
+        {!todayIso ? (
+          <div style={{ minHeight: '200px' }} />
+        ) : Object.keys(usciteRaggruppate).length === 0 ? (
           <p style={{ color: '#aaa' }}>Nessuna uscita trovata per questa selezione.</p>
         ) : (
           Object.entries(usciteRaggruppate).map(([data, uscite]) => (

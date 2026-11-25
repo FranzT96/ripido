@@ -1,4 +1,3 @@
-'use client';
 import Link from 'next/link';
 
 export default function RipidoHome() {
@@ -7,6 +6,23 @@ export default function RipidoHome() {
       {/* Nota: height 100dvh previene problemi con la barra di navigazione mobile */}
       
       <style>{`
+        @media (min-width: 769px) and (max-width: 1100px) {
+          .ripido-logo-box {
+            width: 170px !important;
+            top: -18px !important;
+          }
+          .ripido-nav-bar {
+            left: auto !important;
+            right: 24px !important;
+            transform: none !important;
+            gap: 12px !important;
+          }
+          .ripido-btn {
+            font-size: 11px !important;
+            padding: 8px 16px !important;
+            letter-spacing: 0.12em !important;
+          }
+        }
         @media (max-width: 768px) {
           .ripido-bg-img {
             object-position: 25% center !important; /* Non taglia via gli alberi a sinistra su mobile */
@@ -23,7 +39,7 @@ export default function RipidoHome() {
             transform: translateX(-50%) !important;
             width: 95vw !important;
             justify-content: center !important;
-            flex-wrap: wrap !important; /* Fa andare a capo i 4 pulsanti su due righe */
+            flex-wrap: wrap !important; /* Fa andare a capo i pulsanti se lo schermo è stretto */
             gap: 8px !important;
             padding: 0 10px !important;
           }
@@ -43,6 +59,7 @@ export default function RipidoHome() {
           }
           .ripido-motto-text {
             font-size: clamp(1.3rem, 6vw, 2.2rem) !important;
+            white-space: normal !important;
           }
           .cta-bottom {
             align-self: center !important;
@@ -125,10 +142,10 @@ export default function RipidoHome() {
       </div>
 
       {/* 4. TESTO */}
-      <div className="ripido-motto-box" style={{ position: 'absolute', bottom: '150px', left: '40px', zIndex: 10, maxWidth: '50vw', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '20px' }}>
+      <div className="ripido-motto-box" style={{ position: 'absolute', bottom: '150px', left: '40px', zIndex: 10, maxWidth: 'min(90vw, 800px)', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '20px' }}>
         <h1 className="ripido-motto-text" style={{ color: 'white', fontSize: 'clamp(1.5rem, 3.5vw, 3.5rem)', fontWeight: 'bold', lineHeight: '1.2', margin: 0, textShadow: '2px 4px 15px rgba(0,0,0,0.9)', whiteSpace: 'nowrap' }}>
           The mountains are calling.<br />
-          <span style={{ fontStyle: 'italic', fontWeight: '300' }}>Your friends aren't.</span><br />
+          <span style={{ fontFamily: 'var(--font-playfair), serif', fontStyle: 'italic', fontWeight: '400' }}>Your friends aren't.</span><br />
           <span style={{ color: 'rgb(223, 254, 2)' }}>Find your people.</span>
         </h1>
         

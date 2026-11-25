@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Montserrat, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
@@ -8,6 +9,7 @@ const montserrat = Montserrat({ subsets: ["latin"], variable: '--font-montserrat
 const playfair = Playfair_Display({ subsets: ["latin"], style: ['normal', 'italic'], variable: '--font-playfair' });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://ripido.vercel.app"),
   title: "Ripido | The mountains are calling",
   description: "Community per appassionati di montagna. Escursioni, weekend in rifugio e cene in casera. Find your people.",
   openGraph: {
@@ -35,7 +37,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="it" className="m-0 p-0 w-full h-full scroll-smooth">
-      <body className={`${montserrat.className} ${montserrat.variable} ${playfair.variable} bg-[#111827] text-white m-0 p-0 w-full h-full overflow-x-hidden antialiased`}>
+      <body className={`${montserrat.className} ${montserrat.variable} ${playfair.variable} bg-[#0a0a0a] text-white m-0 p-0 w-full h-full overflow-x-hidden antialiased`}>
         
         {/* IL CONTENUTO DELLE PAGINE */}
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -49,7 +51,7 @@ export default function RootLayout({
               <div>&copy; 2026 Ripido. Tutti i diritti riservati.</div>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '25px' }}>
                 <a href="#" style={{ color: '#888', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Privacy Policy</a>
-                <a href="/social" style={{ color: '#888', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Entra nel gruppo</a>
+                <Link href="/social" style={{ color: '#888', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Entra nel gruppo</Link>
               </div>
             </div>
           </footer>
